@@ -1,0 +1,6 @@
+{
+  "last_successful_step": "complete",
+  "setup_date": "2025-01-22",
+  "project_type": "brownfield",
+  "detected_stack": ["typescript", "bun", "opencode-plugin"]
+}
