@@ -1,5 +1,458 @@
 import type { BuiltinSkill } from "./types"
 
+// =============================================================================
+// MAESTRO WORKFLOW SKILLS
+// =============================================================================
+
+const maestroCoreSkill: BuiltinSkill = {
+  name: "maestro-core",
+  description: "Use when any Maestro skill loads - provides skill hierarchy, HALT/DEGRADE policies, and trigger routing rules for orchestration decisions",
+  template: `# Maestro Core - Workflow Router
+
+Central hub for Maestro workflow skills. Routes triggers, defines hierarchy, and handles fallbacks.
+
+## Skill Hierarchy
+
+\`\`\`
+conductor (1) > orchestrator (2) > designing (3) > tracking (4) > specialized (5)
+\`\`\`
+
+Higher rank wins on conflicts.
+
+## Ownership Matrix
+
+| Skill | Owns | Primary Triggers |
+|-------|------|------------------|
+| conductor | Implementation + autonomous | \`ci\`, \`ca\`, \`/conductor-implement\`, \`/conductor-autonomous\` |
+| orchestrator | Parallel execution | \`co\`, \`/conductor-orchestrate\` |
+| designing | Phases 1-10 (design → track creation) | \`ds\`, \`cn\`, \`/conductor-newtrack\`, \`/conductor-design\` |
+| tracking | Task/bead management | \`bd *\`, \`fb\`, \`rb\` |
+| handoff | Session cycling | \`ho\`, \`/conductor-finish\`, \`/conductor-handoff\` |
+| creating-skills | Skill authoring | "create skill", "write skill" |
+
+## Workflow Chain
+
+\`\`\`
+ds/cn → design.md → /conductor-newtrack → spec.md + plan.md → fb → tracking → ci/co/ca → implementation
+\`\`\`
+
+## Routing Table
+
+**CRITICAL:** After loading \`maestro-core\`, you MUST explicitly load the target skill via \`skill(name="...")\` before proceeding.
+
+### Quick Triggers
+
+| Trigger | Skill |
+|---------|-------|
+| \`ds\`, \`cn\` | designing |
+| \`ci\` | conductor |
+| \`ca\` | conductor |
+| \`co\` | orchestrator |
+| \`fb\`, \`rb\`, \`bd *\` | tracking |
+| \`ho\` | handoff |
+
+### Routing Flow
+
+\`\`\`
+1. User triggers command (e.g., \`ci\`)
+2. Load maestro-core → get routing table
+3. Look up trigger → find target skill
+4. MUST call skill tool to load target skill
+5. Follow loaded skill instructions
+\`\`\`
+
+## Fallback Policies
+
+| Condition | Action | Message |
+|-----------|--------|---------|
+| \`bd\` unavailable | HALT | \`❌ Cannot proceed: bd CLI required\` |
+| \`conductor/\` missing | DEGRADE | \`⚠️ Standalone mode - limited features\` |
+| Agent Mail unavailable | HALT | \`❌ Cannot proceed: Agent Mail required for coordination\` |
+
+## Related Skills
+
+- **designing** - Double Diamond design sessions (phases 1-10)
+- **conductor** - Implementation execution
+- **orchestrator** - Multi-agent parallel execution
+- **tracking** - Issue tracking and dependency graphs
+- **handoff** - Session cycling and context preservation`,
+}
+
+const designingSkill: BuiltinSkill = {
+  name: "designing",
+  description: "Design Session - collaborative brainstorming to turn ideas into actionable implementation plans using the Unified Pipeline methodology. Use when user types \"ds\" or wants to explore/design a feature before implementation. \"pl\" triggers phases 5-10 (STANDALONE/ALIAS/NO-OP modes). MUST load maestro-core skill first for routing.",
+  template: `# Design & Planning
+
+Turn ideas into fully-formed, implementation-ready designs through a unified 10-phase pipeline.
+
+## Entry Points
+
+| Trigger | Action |
+|---------|--------|
+| \`ds\` | Start unified pipeline (all 10 phases) |
+| \`/conductor-design\` | Start unified pipeline (alias) |
+| \`cn\`, \`/conductor-newtrack\` | Create spec + plan + beads from existing design.md |
+| \`pl\`, \`/plan\` | Planning phases (5-10) - see pl Entry Modes below |
+| "design a feature" | Start unified pipeline |
+| "let's think through X" | Start unified pipeline |
+
+## Quick Reference
+
+### Unified Pipeline (10 Phases)
+
+| # | Phase | Type | Purpose | Exit Criteria |
+|---|-------|------|---------|---------------|
+| 1 | **DISCOVER** | Diverge | Explore problem + research context | Problem articulated |
+| 2 | **DEFINE** | Converge | Frame problem + select approach | Approach selected |
+| 3 | **DEVELOP** | Diverge | Architecture + components | Interfaces defined |
+| 4 | **VERIFY** | Converge | Oracle audit + risk assessment | Oracle APPROVED |
+| 5 | **DECOMPOSE** | Execute | Create beads (fb) | Beads filed |
+| 6 | **VALIDATE** | Execute | Dependency check (bv) + Oracle review | Dependencies valid |
+| 7 | **ASSIGN** | Execute | Track assignments | Tracks assigned |
+| 8 | **READY** | Complete | Handoff to ci/co/ca | Execution ready |
+| 9 | **EXECUTE** | Implement | Run ci/co/ca on tracks | All beads completed |
+| 10 | **FINISH** | Archive | Extract learnings + archive track | Track archived |
+
+## Mode Routing
+
+Complexity scoring determines execution mode:
+
+| Score | Mode | Phases | A/P/C | Research |
+|-------|------|--------|-------|----------|
+| < 4 | **SPEED** | 1,2,4,8 | No | 1 hook (start) |
+| 4-6 | **ASK** | User chooses | Optional | User chooses |
+| > 6 | **FULL** | 1-10 | Yes | 2 hooks |
+
+## Core Principles
+
+- **One question at a time** - Don't overwhelm
+- **Multiple choice preferred** - Easier to answer
+- **YAGNI ruthlessly** - Remove unnecessary features
+- **Explore alternatives** - Always propose 2-3 approaches
+- **Research consolidated** - 2 strategic hooks, not 5
+
+## ⛔ EXECUTION BLOCKS (CRITICAL)
+
+**This skill contains EXECUTION BLOCKS marked with ⛔. When you encounter one, you MUST:**
+1. **STOP** what you're doing
+2. **EXECUTE** the tool calls specified (Task(), oracle(), skill())
+3. **WAIT** for results before proceeding
+
+**EXECUTION BLOCKS are NOT documentation - they are COMMANDS you must execute.**
+
+## Session Flow
+
+0. **Load Core** - Load maestro-core for routing table and fallback policies
+1. **Initialize** - Load handoffs, CODEMAPS, verify conductor setup
+2. **Research** - ⛔ EXECUTION BLOCK at Phase 1 start (spawn 3 Task() agents)
+3. **Route** - Score complexity (< 4 = SPEED, > 6 = FULL)
+4. **Execute** - 10-phase pipeline with A/P/C checkpoints
+5. **Validate** - ⛔ EXECUTION BLOCK at Phase 4 (call oracle())
+6. **Complete** - Phase 8 (READY) triggers \`ci\`/\`co\`/\`ca\` → Phase 9 (EXECUTE) → Phase 10 (FINISH)
+
+## Next Steps (after Phase 8: READY)
+
+| Command | Description | Phase |
+|---------|-------------|-------|
+| \`ci\` | \`/conductor-implement\` - Execute track | Phase 9 (EXECUTE) |
+| \`co\` | \`/conductor-orchestrate\` - Spawn parallel workers | Phase 9 (EXECUTE) |
+| \`ca\` | \`/conductor-autonomous\` - Ralph loop | Phase 9 (EXECUTE) |
+| \`/conductor-finish\` | Archive track + extract learnings | Phase 10 (FINISH) |
+
+## Anti-Patterns
+
+- ❌ Jumping to solutions before understanding the problem
+- ❌ Skipping verification at Phase 4 (VERIFY)
+- ❌ Asking multiple questions at once
+- ❌ Over-engineering simple features (use SPEED mode)
+- ❌ Running \`pl\` after \`ds\` completes (no longer needed)
+
+## Related
+
+- **conductor** - Track creation and implementation
+- **tracking** - Issue tracking after design
+- **orchestrator** - Parallel execution in Phase 9 (EXECUTE)`,
+}
+
+const conductorSkill: BuiltinSkill = {
+  name: "conductor",
+  description: "Implementation execution for context-driven development. Trigger with ci, /conductor-implement, or /conductor-* commands. Use when executing tracks with specs/plans. For design phases, see designing skill. For session handoffs, see handoff skill.",
+  template: `# Conductor: Implementation Execution
+
+Execute tracks with TDD and parallel routing.
+
+## Entry Points
+
+| Trigger | Action | Reference |
+|---------|--------|-----------|
+| \`/conductor-setup\` | Initialize project context | Setup workflow |
+| \`/conductor-implement\` | Execute track (auto-routes if parallel) | Implement workflow |
+| \`ca\`, \`/conductor-autonomous\` | **Run ralph.sh directly** (no Task/sub-agents) | Autonomous workflow |
+| \`/conductor-status\` | Display progress overview | Structure |
+| \`/conductor-revise\` | Update spec/plan mid-work | Revisions |
+
+## Related Skills (Not Owned by Conductor)
+
+| For... | Use Skill | Triggers |
+|--------|-----------|----------|
+| Design phases (1-8) | designing | \`ds\`, \`cn\`, \`/conductor-design\`, \`/conductor-newtrack\` |
+| Session handoffs | handoff | \`ho\`, \`/conductor-finish\`, \`/conductor-handoff\` |
+
+## Quick Reference
+
+| Phase | Purpose | Output | Skill |
+|-------|---------|--------|-------|
+| Requirements | Understand problem | design.md | designing |
+| Plan | Create spec + plan | spec.md + plan.md | designing |
+| **Implement** | Build with TDD | Code + tests | **conductor** |
+| **Autonomous** | Ralph loop execution | Auto-verified stories | **conductor** |
+| Reflect | Verify before shipping | LEARNINGS.md | handoff |
+
+## Core Principles
+
+- **Load core first** - Load maestro-core for routing table and fallback policies
+- **TDD by default** - RED → GREEN → REFACTOR (use \`--no-tdd\` to disable)
+- **Beads integration** - Zero manual \`bd\` commands in happy path
+- **Parallel routing** - \`## Track Assignments\` in plan.md triggers orchestrator
+- **Validation gates** - Automatic checks at each phase transition
+
+## Directory Structure
+
+\`\`\`
+conductor/
+├── product.md, tech-stack.md, workflow.md  # Project context
+├── code_styleguides/                       # Language-specific style rules
+├── CODEMAPS/                               # Architecture docs
+├── handoffs/                               # Session context
+├── spikes/                                 # Research spikes (pl output)
+└── tracks/<track_id>/                      # Per-track work
+    ├── design.md, spec.md, plan.md         # Planning artifacts
+    └── metadata.json                       # State tracking (includes planning state)
+\`\`\`
+
+## Beads Integration
+
+All execution routes through orchestrator with Agent Mail coordination:
+- Workers claim beads via \`bd update --status in_progress\`
+- Workers close beads via \`bd close --reason completed|skipped|blocked\`
+- File reservations via \`file_reservation_paths\`
+- Communication via \`send_message\`/\`fetch_inbox\`
+
+## /conductor-implement Auto-Routing
+
+1. Read \`metadata.json\` - check \`orchestrated\` flag
+2. Read \`plan.md\` - check for \`## Track Assignments\`
+3. Check \`beads.fileScopes\` - file-scope based grouping
+4. If parallel detected (≥2 non-overlapping groups) → Load orchestrator skill
+5. Else → Sequential execution with TDD
+
+## Anti-Patterns
+
+- ❌ Manual \`bd\` commands when workflow commands exist
+- ❌ Ignoring validation gate failures
+- ❌ Using conductor for design (use designing instead)
+- ❌ Using conductor for handoffs (use handoff instead)
+
+## Related
+
+- **designing** - Double Diamond design + track creation
+- **handoff** - Session cycling and finish workflow
+- **tracking** - Issue tracking (beads)
+- **orchestrator** - Parallel execution
+- **maestro-core** - Routing policies`,
+}
+
+const orchestratorSkill: BuiltinSkill = {
+  name: "orchestrator",
+  description: "Multi-agent parallel execution with autonomous workers. Use when plan.md has Track Assignments section or user triggers /conductor-orchestrate, \"run parallel\", \"spawn workers\". MUST load maestro-core skill first for routing.",
+  template: `# Orchestrator - Multi-Agent Parallel Execution
+
+> **Spawn autonomous workers to execute tracks in parallel using Agent Mail coordination.**
+
+## Agent Mail: CLI Primary, MCP Fallback
+
+This skill uses a **lazy-load pattern** for Agent Mail:
+
+| Priority | Tool | When Available |
+|----------|------|----------------|
+| **Primary** | \`bun toolboxes/agent-mail/agent-mail.js\` | Always (via Bash) |
+| **Fallback** | MCP tools (via \`mcp.json\`) | When skill loaded + MCP server running |
+
+**Detection flow:**
+\`\`\`
+1. Try CLI: bun toolboxes/agent-mail/agent-mail.js health-check
+   ↓ success? → Use CLI for all Agent Mail operations
+   ↓ fails?
+2. Fallback: MCP tools (lazy-loaded via skills/orchestrator/mcp.json)
+\`\`\`
+
+**CLI benefits:** Zero token cost until used, no MCP server dependency.
+
+## Core Principles
+
+- **Load core first** - Load maestro-core for routing table and fallback policies
+- **CLI first** - Use \`bun toolboxes/agent-mail/agent-mail.js\` CLI before falling back to MCP tools
+- **Pre-register workers** before spawning (Agent Mail validates recipients)
+- **Workers own their beads** - can \`bd claim/close\` directly (unlike sequential mode)
+- **File reservations prevent conflicts** - reserve before edit, release on complete
+- **Summary before exit** - all workers MUST send completion message
+- **TDD by default** - workers follow RED → GREEN → REFACTOR cycle (use \`--no-tdd\` to disable)
+
+## When to Use
+
+| Trigger | Condition |
+|---------|-----------| 
+| Auto-routed | \`/conductor-implement\` when plan has Track Assignments |
+| File-scope | \`/conductor-implement\` when ≥2 non-overlapping file groups detected |
+| Direct | \`/conductor-orchestrate\` or \`co\` |
+| Phrase | "run parallel", "spawn workers", "dispatch agents" |
+| **See also** | \`ca\` for autonomous execution |
+
+## Auto-Trigger Behavior
+
+Parallel execution starts **automatically** when detected - no confirmation needed:
+
+\`\`\`
+📊 Parallel execution detected:
+- Track A: 2 tasks (src/api/)
+- Track B: 2 tasks (lib/)
+- Track C: 1 task (schemas/)
+
+⚡ Spawning workers...
+\`\`\`
+
+## Quick Reference
+
+| Action | Tool |
+|--------|------|
+| Parse plan.md | \`Read("conductor/tracks/<id>/plan.md")\` |
+| Initialize | \`bun toolboxes/agent-mail/agent-mail.js macro-start-session\` |
+| Spawn workers | \`Task()\` for each track |
+| Monitor | \`bun toolboxes/agent-mail/agent-mail.js fetch-inbox\` |
+| Resolve blockers | \`bun toolboxes/agent-mail/agent-mail.js reply-message\` |
+| Complete | \`bun toolboxes/agent-mail/agent-mail.js send-message\`, \`bd close epic\` |
+| Track threads | \`bun toolboxes/agent-mail/agent-mail.js summarize-thread\` |
+| Auto-routing | Auto-detect parallel via \`metadata.json.beads\` |
+
+## 8-Phase Orchestrator Protocol
+
+0. **Preflight** - Session identity, detect active sessions
+1. **Read Plan** - Parse Track Assignments from plan.md
+2. **Validate** - Health check Agent Mail CLI (HALT if unavailable)
+3. **Initialize** - ensure_project, register orchestrator + all workers
+4. **Spawn Workers** - Task() for each track (parallel)
+5. **Monitor + Verify** - fetch_inbox, verify worker summaries
+   - Workers use track threads (\`TRACK_THREAD\`) for bead-to-bead context
+6. **Resolve** - reply_message for blockers
+7. **Complete** - Send summary, close epic, \`rb\` review
+
+## Worker 4-Step Protocol
+
+All workers MUST follow this exact sequence:
+
+\`\`\`
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  STEP 1: INITIALIZE  - bun toolboxes/agent-mail/agent-mail.js macro-start-session   │
+│  STEP 2: EXECUTE     - claim beads, do work, close beads                            │
+│  STEP 3: REPORT      - bun toolboxes/agent-mail/agent-mail.js send-message          │
+│  STEP 4: CLEANUP     - bun toolboxes/agent-mail/agent-mail.js release-file-reservations │
+└──────────────────────────────────────────────────────────────────────────────┘
+\`\`\`
+
+| Step | Tool | Required |
+|------|------|----------|
+| 1 | \`bun toolboxes/agent-mail/agent-mail.js macro-start-session\` | ✅ FIRST |
+| 2 | \`bd update\`, \`bd close\` | ✅ |
+| 3 | \`bun toolboxes/agent-mail/agent-mail.js send-message\` | ✅ LAST |
+| 4 | \`bun toolboxes/agent-mail/agent-mail.js release-file-reservations\` | ✅ |
+
+**Critical rules:**
+- ❌ Never start work before \`macro-start-session\`
+- ❌ Never return without \`send-message\` to orchestrator
+- ❌ Never touch files outside assigned scope
+
+## Anti-Patterns
+
+| ❌ Don't | ✅ Do |
+|----------|-------|
+| Spawn workers without pre-registration | Register all workers BEFORE spawning |
+| Skip completion summary | Always send_message before exit |
+| Ignore file reservation conflicts | Wait or resolve before proceeding |
+| Use orchestration for simple tasks | Use sequential \`/conductor-implement\` |
+
+## Related
+
+- **maestro-core** - Routing and fallback policies
+- **conductor** - Track management, \`/conductor-implement\`
+- **tracking** - Issue tracking, \`bd\` commands`,
+}
+
+const trackingSkill: BuiltinSkill = {
+  name: "tracking",
+  description: `Tracks complex, multi-session work using the Beads issue tracker and dependency graphs, and provides persistent memory that survives conversation compaction. Use when work spans multiple sessions, has complex dependencies, or needs persistent context across compaction cycles. Trigger with phrases like "create task for", "what's ready to work on", "show task", "track this work", "what's blocking", or "update status". MUST load maestro-core skill first for routing.`,
+  template: `# Tracking - Persistent Memory for AI Agents
+
+Graph-based issue tracker that survives conversation compaction. Provides persistent memory for multi-session work with complex dependencies.
+
+## Prerequisites
+
+- **Load maestro-core first** - For routing table and fallback policies
+
+## Entry Points
+
+| Trigger | Reference | Action |
+|---------|-----------|--------|
+| \`bd\`, \`beads\` | Core CLI operations | Base bead commands |
+| \`fb\`, \`file-beads\` | File beads from plan → auto-orchestration | Auto-filed beads |
+| \`rb\`, \`review-beads\` | Review filed beads | Bead review |
+
+## Quick Decision
+
+**bd vs TodoWrite**:
+- "Will I need this in 2 weeks?" → **YES** = bd
+- "Could history get compacted?" → **YES** = bd
+- "Has blockers/dependencies?" → **YES** = bd
+- "Done this session?" → **YES** = TodoWrite
+
+**Rule**: If resuming in 2 weeks would be hard without bd, use bd.
+
+## Essential Commands
+
+| Command | Purpose |
+|---------|---------|
+| \`bd ready\` | Show tasks ready to work on |
+| \`bd create "Title" -p 1\` | Create new task |
+| \`bd show <id>\` | View task details |
+| \`bd update <id> --status in_progress\` | Start working |
+| \`bd update <id> --notes "Progress"\` | Add progress notes |
+| \`bd close <id> --reason completed\` | Complete task |
+| \`bd dep add <child> <parent>\` | Add dependency |
+| \`bd sync\` | Sync with git remote |
+
+## Session Protocol
+
+1. **Start**: \`bd ready\` → pick highest priority → \`bd show <id>\` → update to \`in_progress\`
+2. **Work**: Add notes frequently (critical for compaction survival)
+3. **End**: Close finished work → \`bd sync\` → \`git push\`
+
+## Anti-Patterns
+
+- ❌ Using TodoWrite for multi-session work
+- ❌ Forgetting to add notes (loses context on compaction)
+- ❌ Not running \`bd sync\` before ending session
+- ❌ Creating beads for trivial single-session tasks
+
+## Related
+
+- **maestro-core** - Workflow router and skill hierarchy
+- **conductor** - Automated beads operations via facade
+- **orchestrator** - Multi-agent parallel execution`,
+}
+
+// =============================================================================
+// EXISTING SKILLS
+// =============================================================================
+
 const playwrightSkill: BuiltinSkill = {
   name: "playwright",
   description: "MUST USE for any browser-related tasks. Browser automation via Playwright MCP - verification, browsing, information gathering, web scraping, testing, screenshots, and all browser interactions.",
@@ -1226,5 +1679,14 @@ POTENTIAL ACTIONS:
 }
 
 export function createBuiltinSkills(): BuiltinSkill[] {
-  return [playwrightSkill, frontendUiUxSkill, gitMasterSkill]
+  return [
+    maestroCoreSkill,
+    designingSkill,
+    conductorSkill,
+    orchestratorSkill,
+    trackingSkill,
+    playwrightSkill,
+    frontendUiUxSkill,
+    gitMasterSkill,
+  ]
 }
