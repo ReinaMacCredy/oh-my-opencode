@@ -267,13 +267,25 @@ export function generateOmoConfig(installConfig: InstallConfig): Record<string, 
     $schema: "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
   }
 
-  if (installConfig.hasGemini) {
+  if (installConfig.hasProxyPal || installConfig.hasGemini) {
     config.google_auth = false
   }
 
   const agents: Record<string, Record<string, unknown>> = {}
 
-  if (installConfig.hasGemini) {
+  if (installConfig.hasProxyPal) {
+    agents["Sisyphus"] = { model: "proxypal/gemini-claude-opus-4-5-thinking" }
+    agents["librarian"] = { model: "proxypal/gemini-claude-opus-4-5-thinking" }
+    agents["explore"] = { model: "proxypal/gemini-3-flash-preview" }
+    agents["frontend-ui-ux-engineer"] = { model: "proxypal/gemini-3-pro-preview" }
+    agents["document-writer"] = { model: "proxypal/gemini-3-flash-preview" }
+    agents["multimodal-looker"] = { model: "proxypal/gemini-3-flash-preview" }
+    agents["orchestrator-sisyphus"] = { model: "proxypal/gemini-claude-sonnet-4-5-thinking" }
+    agents["Prometheus (Planner)"] = { model: "proxypal/gemini-claude-opus-4-5-thinking" }
+    agents["Metis (Plan Consultant)"] = { model: "proxypal/gemini-claude-opus-4-5-thinking" }
+    agents["oracle"] = { model: "proxypal/gpt-5.2-codex" }
+    agents["Momus (Plan Reviewer)"] = { model: "proxypal/gpt-5.2-codex" }
+  } else if (installConfig.hasGemini) {
     agents["Sisyphus"] = { model: "proxypal/gemini-claude-opus-4-5-thinking" }
     agents["librarian"] = { model: "proxypal/gemini-claude-opus-4-5-thinking" }
     agents["explore"] = { model: "proxypal/gemini-3-flash-preview" }
@@ -299,21 +311,34 @@ export function generateOmoConfig(installConfig: InstallConfig): Record<string, 
     agents["multimodal-looker"] = { model: "opencode/glm-4.7-free" }
   }
 
-  if (installConfig.hasChatGPT) {
-    agents["oracle"] = { model: "proxypal/gpt-5.2-codex" }
-    agents["Momus (Plan Reviewer)"] = { model: "proxypal/gpt-5.2-codex" }
-  } else if (installConfig.hasClaude) {
-    agents["oracle"] = { model: "anthropic/claude-opus-4-5" }
-    agents["Momus (Plan Reviewer)"] = { model: "anthropic/claude-opus-4-5" }
-  } else {
-    agents["oracle"] = { model: "opencode/glm-4.7-free" }
+  // Oracle and Momus are already set if hasProxyPal is true, skip this block
+  if (!installConfig.hasProxyPal) {
+    if (installConfig.hasChatGPT) {
+      agents["oracle"] = { model: "proxypal/gpt-5.2-codex" }
+      agents["Momus (Plan Reviewer)"] = { model: "proxypal/gpt-5.2-codex" }
+    } else if (installConfig.hasClaude) {
+      agents["oracle"] = { model: "anthropic/claude-opus-4-5" }
+      agents["Momus (Plan Reviewer)"] = { model: "anthropic/claude-opus-4-5" }
+    } else {
+      agents["oracle"] = { model: "opencode/glm-4.7-free" }
+    }
   }
 
   if (Object.keys(agents).length > 0) {
     config.agents = agents
   }
 
-  if (installConfig.hasGemini) {
+  if (installConfig.hasProxyPal) {
+    config.categories = {
+      "visual-engineering": { model: "proxypal/gemini-3-pro-preview" },
+      ultrabrain: { model: "proxypal/gpt-5.2-codex" },
+      artistry: { model: "proxypal/gemini-3-pro-preview" },
+      quick: { model: "proxypal/gemini-3-flash-preview" },
+      "most-capable": { model: "proxypal/gemini-claude-opus-4-5-thinking" },
+      writing: { model: "proxypal/gemini-3-flash-preview" },
+      general: { model: "proxypal/gemini-claude-opus-4-5-thinking" },
+    }
+  } else if (installConfig.hasGemini) {
     config.categories = {
       "visual-engineering": { model: "proxypal/gemini-3-pro-preview" },
       ultrabrain: { model: "proxypal/gpt-5.2-codex" },
@@ -532,6 +557,79 @@ export async function runBunInstallWithDetails(): Promise<BunInstallResult> {
  *
  * @see https://github.com/NoeFabris/opencode-antigravity-auth#migration-guide-v127
  */
+const PROXYPAL_PROVIDER_CONFIG = {
+  proxypal: {
+    name: "ProxyPal",
+    npm: "@ai-sdk/anthropic",
+    options: {
+      apiKey: "proxypal-local",
+      baseURL: "http://127.0.0.1:8317/v1",
+      includeUsage: true,
+    },
+    models: {
+      "gemini-claude-opus-4-5-thinking": {
+        name: "Gemini Claude Opus 4 5 Thinking",
+        limit: { context: 168000, output: 64000 },
+        options: { thinking: { budgetTokens: 32768, type: "enabled" } },
+        reasoning: true,
+      },
+      "gemini-claude-sonnet-4-5-thinking": {
+        name: "Gemini Claude Sonnet 4 5 Thinking",
+        limit: { context: 168000, output: 64000 },
+        options: { thinking: { budgetTokens: 32768, type: "enabled" } },
+        reasoning: true,
+      },
+      "gemini-claude-sonnet-4-5": {
+        name: "Gemini Claude Sonnet 4 5",
+        limit: { context: 168000, output: 64000 },
+      },
+      "gemini-3-pro-preview": {
+        name: "Gemini 3 Pro Preview",
+        limit: { context: 880964, output: 65536 },
+      },
+      "gemini-3-flash-preview": {
+        name: "Gemini 3 Flash Preview",
+        limit: { context: 880964, output: 65536 },
+      },
+      "gemini-2.5-flash": {
+        name: "Gemini 2 5 Flash",
+        limit: { context: 880964, output: 65536 },
+      },
+      "gpt-5.2-codex": {
+        name: "Gpt 5 2 Codex",
+        limit: { context: 336000, output: 32768 },
+        options: { reasoningEffort: "xhigh" },
+        reasoning: true,
+      },
+      "gpt-5.2": {
+        name: "Gpt 5 2",
+        limit: { context: 336000, output: 32768 },
+        options: { reasoningEffort: "xhigh" },
+        reasoning: true,
+      },
+      "gpt-5.1-codex-max": {
+        name: "Gpt 5 1 Codex Max",
+        limit: { context: 336000, output: 32768 },
+        options: { reasoningEffort: "xhigh" },
+        reasoning: true,
+      },
+      "antigravity-gemini-3-pro-high": {
+        name: "Gemini 3 Pro High (Antigravity)",
+        thinking: true,
+        attachment: true,
+        limit: { context: 1048576, output: 65535 },
+        modalities: { input: ["text", "image", "pdf"], output: ["text"] },
+      },
+      "antigravity-gemini-3-flash": {
+        name: "Gemini 3 Flash (Antigravity)",
+        attachment: true,
+        limit: { context: 1048576, output: 65536 },
+        modalities: { input: ["text", "image", "pdf"], output: ["text"] },
+      },
+    },
+  },
+}
+
 export const ANTIGRAVITY_PROVIDER_CONFIG = {
   google: {
     name: "Google",
@@ -633,6 +731,10 @@ export function addProviderConfig(config: InstallConfig): ConfigMergeResult {
 
     const providers = (newConfig.provider ?? {}) as Record<string, unknown>
 
+    if (config.hasProxyPal) {
+      providers.proxypal = PROXYPAL_PROVIDER_CONFIG.proxypal
+    }
+
     if (config.hasGemini) {
       providers.google = ANTIGRAVITY_PROVIDER_CONFIG.google
     }
@@ -660,6 +762,7 @@ interface OmoConfigData {
 export function detectCurrentConfig(): DetectedConfig {
   const result: DetectedConfig = {
     isInstalled: false,
+    hasProxyPal: false,
     hasClaude: true,
     isMax20: true,
     hasChatGPT: true,
@@ -709,6 +812,15 @@ export function detectCurrentConfig(): DetectedConfig {
     }
 
     const agents = omoConfig.agents ?? {}
+
+    if (agents["Sisyphus"]?.model?.startsWith("proxypal/")) {
+      result.hasProxyPal = true
+      result.hasClaude = false
+      result.isMax20 = false
+      result.hasChatGPT = false
+      result.hasGemini = false
+      return result
+    }
 
     if (agents["Sisyphus"]?.model === "opencode/glm-4.7-free") {
       result.hasClaude = false

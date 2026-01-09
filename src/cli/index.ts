@@ -24,6 +24,7 @@ program
   .command("install")
   .description("Install and configure oh-my-opencode with interactive setup")
   .option("--no-tui", "Run in non-interactive mode (requires all options)")
+  .option("--proxypal <value>", "ProxyPal proxy: no, yes (if yes, skips claude/chatgpt/gemini)")
   .option("--claude <value>", "Claude subscription: no, yes, max20")
   .option("--chatgpt <value>", "ChatGPT subscription: no, yes")
   .option("--gemini <value>", "Gemini integration: no, yes")
@@ -31,10 +32,12 @@ program
   .addHelpText("after", `
 Examples:
   $ bunx oh-my-opencode install
+  $ bunx oh-my-opencode install --no-tui --proxypal=yes
   $ bunx oh-my-opencode install --no-tui --claude=max20 --chatgpt=yes --gemini=yes
   $ bunx oh-my-opencode install --no-tui --claude=no --chatgpt=no --gemini=no
 
 Model Providers:
+  ProxyPal    Use ProxyPal proxy for all models (github.com/heyhuynhgiabuu/proxypal)
   Claude      Required for Sisyphus (main orchestrator) and Librarian agents
   ChatGPT     Powers the Oracle agent for debugging and architecture
   Gemini      Powers frontend, documentation, and multimodal agents
@@ -42,6 +45,7 @@ Model Providers:
   .action(async (options) => {
     const args: InstallArgs = {
       tui: options.tui !== false,
+      proxypal: options.proxypal,
       claude: options.claude,
       chatgpt: options.chatgpt,
       gemini: options.gemini,

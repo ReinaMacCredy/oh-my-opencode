@@ -3,6 +3,7 @@ export type BooleanArg = "no" | "yes"
 
 export interface InstallArgs {
   tui: boolean
+  proxypal?: BooleanArg
   claude?: ClaudeSubscription
   chatgpt?: BooleanArg
   gemini?: BooleanArg
@@ -10,6 +11,7 @@ export interface InstallArgs {
 }
 
 export interface InstallConfig {
+  hasProxyPal: boolean
   hasClaude: boolean
   isMax20: boolean
   hasChatGPT: boolean
@@ -24,6 +26,7 @@ export interface ConfigMergeResult {
 
 export interface DetectedConfig {
   isInstalled: boolean
+  hasProxyPal: boolean
   hasClaude: boolean
   isMax20: boolean
   hasChatGPT: boolean
