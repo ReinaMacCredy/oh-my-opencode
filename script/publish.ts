@@ -22,6 +22,19 @@ async function fetchPreviousVersion(): Promise<string> {
 }
 
 function bumpVersion(version: string, type: "major" | "minor" | "patch"): string {
+  const prereleaseMatch = version.match(/^(\d+)\.(\d+)\.(\d+)-([a-zA-Z]+)\.(\d+)$/)
+  if (prereleaseMatch) {
+    const [, major, minor, patch, tag, preNum] = prereleaseMatch
+    switch (type) {
+      case "major":
+        return `${Number(major) + 1}.0.0`
+      case "minor":
+        return `${major}.${Number(minor) + 1}.0`
+      case "patch":
+        return `${major}.${minor}.${patch}-${tag}.${Number(preNum) + 1}`
+    }
+  }
+
   const [major, minor, patch] = version.split(".").map(Number)
   switch (type) {
     case "major":
@@ -68,11 +81,11 @@ async function generateChangelog(previous: string): Promise<string[]> {
 async function getContributors(previous: string): Promise<string[]> {
   const notes: string[] = []
 
-  const team = ["actions-user", "github-actions[bot]", "code-yeongyu"]
+  const team = ["actions-user", "github-actions[bot]", "code-yeongyu", "ReinaMacCredy"]
 
   try {
     const compare =
-      await $`gh api "/repos/code-yeongyu/oh-my-opencode/compare/v${previous}...HEAD" --jq '.commits[] | {login: .author.login, message: .commit.message}'`.text()
+      await $`gh api "/repos/ReinaMacCredy/oh-my-opencode/compare/v${previous}...HEAD" --jq '.commits[] | {login: .author.login, message: .commit.message}'`.text()
     const contributors = new Map<string, string[]>()
 
     for (const line of compare.split("\n").filter(Boolean)) {
