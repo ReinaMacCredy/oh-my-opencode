@@ -242,18 +242,27 @@ sisyphus_task(category="visual", ...)
 
 const SISYPHUS_MCP_CLI_SECTION = `### MCP Servers (via mcp-cli)
 
-Use \`mcp-cli\` via Bash tool for MCP server operations:
+Use \`mcp-cli\` via Bash tool for MCP server operations.
+
+**Config Resolution:** mcp-cli needs a config file. Check in order and use first found:
+1. \`.opencode/mcp_servers.json\` (project)
+2. \`./mcp_servers.json\` (project root)
+3. \`~/.config/opencode/mcp_servers.json\` (user)
 
 \`\`\`bash
-mcp-cli                           # List all servers and tools
-mcp-cli <server> -d               # Show server tools with descriptions
-mcp-cli <server>/<tool>           # Get tool JSON schema
-mcp-cli <server>/<tool> '<json>'  # Call tool with arguments
+# Determine config path first
+MCP_CONFIG="\$([ -f .opencode/mcp_servers.json ] && echo '.opencode/mcp_servers.json' || ([ -f mcp_servers.json ] && echo 'mcp_servers.json' || echo ~/.config/opencode/mcp_servers.json))"
+
+# Then use with -c flag
+mcp-cli -c "$MCP_CONFIG"                           # List all servers and tools
+mcp-cli -c "$MCP_CONFIG" <server> -d               # Show server tools with descriptions
+mcp-cli -c "$MCP_CONFIG" <server>/<tool>           # Get tool JSON schema
+mcp-cli -c "$MCP_CONFIG" <server>/<tool> '<json>'  # Call tool with arguments
 \`\`\`
 
 **Example:**
 \`\`\`bash
-mcp-cli context7/query-docs '{"libraryId": "/vercel/next.js", "query": "app router"}'
+mcp-cli -c "$MCP_CONFIG" context7/query-docs '{"libraryId": "/vercel/next.js", "query": "app router"}'
 \`\`\`
 
 **Available MCP servers:**
