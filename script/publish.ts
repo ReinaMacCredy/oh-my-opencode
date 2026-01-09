@@ -10,11 +10,27 @@ console.log("=== Publishing oh-my-opencode ===\n")
 
 async function fetchPreviousVersion(): Promise<string> {
   try {
-    const res = await fetch(`https://registry.npmjs.org/${PACKAGE_NAME}/latest`)
+    const res = await fetch(`https://registry.npmjs.org/${PACKAGE_NAME}`)
     if (!res.ok) throw new Error(`Failed to fetch: ${res.statusText}`)
-    const data = (await res.json()) as { version: string }
-    console.log(`Previous version: ${data.version}`)
-    return data.version
+    const data = (await res.json()) as { "dist-tags": Record<string, string>; versions: Record<string, unknown> }
+    
+    const distTags = data["dist-tags"]
+    const betaVersion = distTags?.beta
+    const latestVersion = distTags?.latest
+    
+    const allVersions = Object.keys(data.versions || {})
+      .filter(v => v.includes("-beta."))
+      .sort((a, b) => {
+        const aMatch = a.match(/-beta\.(\d+)$/)
+        const bMatch = b.match(/-beta\.(\d+)$/)
+        return (Number(bMatch?.[1] ?? 0)) - (Number(aMatch?.[1] ?? 0))
+      })
+    
+    const highestBeta = allVersions[0]
+    const previousVersion = highestBeta || betaVersion || latestVersion || "0.0.0"
+    
+    console.log(`Previous version: ${previousVersion}`)
+    return previousVersion
   } catch {
     console.log("No previous version found, starting from 0.0.0")
     return "0.0.0"
