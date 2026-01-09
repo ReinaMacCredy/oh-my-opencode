@@ -31,3 +31,5 @@ export { createTaskResumeInfoHook } from "./task-resume-info";
 export { createStartWorkHook } from "./start-work";
 export { createSisyphusOrchestratorHook } from "./sisyphus-orchestrator";
 export { createMaestroModeDetectorHook, MAESTRO_HOOK_NAME } from "../features/maestro/hooks";
+export { createMaestroSisyphusBridgeHook } from "./maestro-sisyphus-bridge";
+export { createTddEnforcementHook } from "./tdd-enforcement";

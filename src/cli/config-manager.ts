@@ -268,7 +268,6 @@ export function generateOmoConfig(installConfig: InstallConfig): Record<string, 
   }
 
   if (installConfig.hasProxyPal || installConfig.hasGemini) {
-    config.google_auth = false
   }
 
   const agents: Record<string, Record<string, unknown>> = {}
@@ -464,9 +463,9 @@ export async function addAuthPlugins(config: InstallConfig): Promise<ConfigMerge
     const plugins: string[] = existingConfig?.plugin ?? []
 
     if (config.hasGemini) {
-      const version = await fetchLatestVersion("opencode-antigravity-auth")
-      const pluginEntry = version ? `opencode-antigravity-auth@${version}` : "opencode-antigravity-auth"
-      if (!plugins.some((p) => p.startsWith("opencode-antigravity-auth"))) {
+      const version = await fetchLatestVersion("opencode-proxypal-auth")
+      const pluginEntry = version ? `opencode-proxypal-auth@${version}` : "opencode-proxypal-auth"
+      if (!plugins.some((p) => p.startsWith("opencode-proxypal-auth"))) {
         plugins.push(pluginEntry)
       }
     }
@@ -544,18 +543,18 @@ export async function runBunInstallWithDetails(): Promise<BunInstallResult> {
 }
 
 /**
- * Antigravity Provider Configuration
+ * ProxyPal Provider Configuration
  *
- * IMPORTANT: Model names MUST use `antigravity-` prefix for stability.
+ * IMPORTANT: Model names MUST use `proxypal-` prefix for stability.
  *
- * The opencode-antigravity-auth plugin supports two naming conventions:
- * - `antigravity-gemini-3-pro-high` (RECOMMENDED, explicit Antigravity quota routing)
+ * The opencode-proxypal-auth plugin supports two naming conventions:
+ * - `gemini-3-pro-high` (RECOMMENDED, explicit ProxyPal quota routing)
  * - `gemini-3-pro-high` (LEGACY, backward compatible but may break in future)
  *
  * Legacy names rely on Gemini CLI using `-preview` suffix for disambiguation.
  * If Google removes `-preview`, legacy names may route to wrong quota.
  *
- * @see https://github.com/NoeFabris/opencode-antigravity-auth#migration-guide-v127
+ * @see https://github.com/NoeFabris/opencode-proxypal-auth#migration-guide-v127
  */
 const PROXYPAL_PROVIDER_CONFIG = {
   proxypal: {
@@ -613,15 +612,15 @@ const PROXYPAL_PROVIDER_CONFIG = {
         options: { reasoningEffort: "xhigh" },
         reasoning: true,
       },
-      "antigravity-gemini-3-pro-high": {
-        name: "Gemini 3 Pro High (Antigravity)",
+      "gemini-3-pro-high": {
+        name: "Gemini 3 Pro High (ProxyPal)",
         thinking: true,
         attachment: true,
         limit: { context: 1048576, output: 65535 },
         modalities: { input: ["text", "image", "pdf"], output: ["text"] },
       },
-      "antigravity-gemini-3-flash": {
-        name: "Gemini 3 Flash (Antigravity)",
+      "gemini-3-flash": {
+        name: "Gemini 3 Flash (ProxyPal)",
         attachment: true,
         limit: { context: 1048576, output: 65536 },
         modalities: { input: ["text", "image", "pdf"], output: ["text"] },
@@ -634,22 +633,22 @@ export const ANTIGRAVITY_PROVIDER_CONFIG = {
   google: {
     name: "Google",
     models: {
-      "antigravity-gemini-3-pro-high": {
-        name: "Gemini 3 Pro High (Antigravity)",
+      "gemini-3-pro-high": {
+        name: "Gemini 3 Pro High (ProxyPal)",
         thinking: true,
         attachment: true,
         limit: { context: 1048576, output: 65535 },
         modalities: { input: ["text", "image", "pdf"], output: ["text"] },
       },
-      "antigravity-gemini-3-pro-low": {
-        name: "Gemini 3 Pro Low (Antigravity)",
+      "gemini-3-pro-low": {
+        name: "Gemini 3 Pro Low (ProxyPal)",
         thinking: true,
         attachment: true,
         limit: { context: 1048576, output: 65535 },
         modalities: { input: ["text", "image", "pdf"], output: ["text"] },
       },
-      "antigravity-gemini-3-flash": {
-        name: "Gemini 3 Flash (Antigravity)",
+      "gemini-3-flash": {
+        name: "Gemini 3 Flash (ProxyPal)",
         attachment: true,
         limit: { context: 1048576, output: 65536 },
         modalities: { input: ["text", "image", "pdf"], output: ["text"] },
@@ -755,7 +754,6 @@ export function addProviderConfig(config: InstallConfig): ConfigMergeResult {
 }
 
 interface OmoConfigData {
-  google_auth?: boolean
   agents?: Record<string, { model?: string }>
 }
 
@@ -787,7 +785,7 @@ export function detectCurrentConfig(): DetectedConfig {
     return result
   }
 
-  result.hasGemini = plugins.some((p) => p.startsWith("opencode-antigravity-auth"))
+  result.hasGemini = plugins.some((p) => p.startsWith("opencode-proxypal-auth"))
   result.hasChatGPT = plugins.some((p) => p.startsWith("opencode-openai-codex-auth"))
 
   const omoConfigPath = getOmoConfig()
@@ -836,9 +834,6 @@ export function detectCurrentConfig(): DetectedConfig {
       result.hasChatGPT = false
     }
 
-    if (omoConfig.google_auth === false) {
-      result.hasGemini = plugins.some((p) => p.startsWith("opencode-antigravity-auth"))
-    }
   } catch {
     /* intentionally empty - malformed omo config returns defaults from opencode config detection */
   }
