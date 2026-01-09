@@ -5,8 +5,8 @@
 
 > [!TIP]
 >
-> [![The Orchestrator is now available in beta.](./.github/assets/orchestrator-sisyphus.png?v=3)](https://github.com/code-yeongyu/oh-my-opencode/releases/tag/v3.0.0-beta.1)
-> > **オーケストレーターがベータ版で利用可能になりました。`oh-my-opencode@3.0.0-beta.1`を使用してインストールしてください。**
+> [![The Orchestrator is now available in beta.](./.github/assets/orchestrator-sisyphus.png?v=3)](https://github.com/ReinaMacCredy/oh-my-opencode/releases)
+> > **オーケストレーターがベータ版で利用可能になりました。`@reinamaccredy/oh-my-opencode@3.0.0-beta.1`を使用してインストールしてください。**
 >
 > 一緒に歩みましょう！
 >
@@ -19,9 +19,9 @@
 
 <div align="center">
 
-[![Oh My OpenCode](./.github/assets/hero.jpg)](https://github.com/code-yeongyu/oh-my-opencode#oh-my-opencode)
+[![Oh My OpenCode](./.github/assets/hero.jpg)](https://github.com/ReinaMacCredy/oh-my-opencode#oh-my-opencode)
 
-[![Preview](./.github/assets/omo.png)](https://github.com/code-yeongyu/oh-my-opencode#oh-my-opencode)
+[![Preview](./.github/assets/omo.png)](https://github.com/ReinaMacCredy/oh-my-opencode#oh-my-opencode)
 
 
 </div>
