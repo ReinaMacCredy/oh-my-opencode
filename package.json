@@ -1,12 +1,13 @@
 {
-  "name": "oh-my-opencode",
-  "version": "2.14.0",
-  "description": "The Best AI Agent Harness - Batteries-Included OpenCode Plugin with Multi-Model Orchestration, Parallel Background Agents, and Crafted LSP/AST Tools",
+  "name": "@reinamaccredy/oh-my-opencode",
+  "version": "1.0.0",
+  "description": "Fork of oh-my-opencode with Maestro workflow integration - Multi-Model Orchestration, Parallel Background Agents, Design Phases, and TDD Methodology",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "bin": {
-    "oh-my-opencode": "./dist/cli/index.js"
+    "oh-my-opencode": "./dist/cli/index.js",
+    "omo": "./dist/cli/index.js"
   },
   "files": [
     "dist"
@@ -43,12 +44,12 @@
   "license": "SUL-1.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/code-yeongyu/oh-my-opencode.git"
+    "url": "git+https://github.com/ReinaMacCredy/oh-my-opencode.git"
   },
   "bugs": {
-    "url": "https://github.com/code-yeongyu/oh-my-opencode/issues"
+    "url": "https://github.com/ReinaMacCredy/oh-my-opencode/issues"
   },
-  "homepage": "https://github.com/code-yeongyu/oh-my-opencode#readme",
+  "homepage": "https://github.com/ReinaMacCredy/oh-my-opencode#readme",
   "dependencies": {
     "@ast-grep/cli": "^0.40.0",
     "@ast-grep/napi": "^0.40.0",
