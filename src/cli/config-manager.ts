@@ -273,49 +273,59 @@ export function generateOmoConfig(installConfig: InstallConfig): Record<string, 
 
   const agents: Record<string, Record<string, unknown>> = {}
 
-  if (!installConfig.hasClaude) {
-    agents["Sisyphus"] = { model: "opencode/glm-4.7-free" }
-  }
-
-  agents["librarian"] = { model: "opencode/glm-4.7-free" }
-
-  // Gemini models use `proxypal/` prefix for ProxyPal routing
-  // @see ANTIGRAVITY_PROVIDER_CONFIG comments for rationale
   if (installConfig.hasGemini) {
+    agents["Sisyphus"] = { model: "proxypal/gemini-claude-opus-4-5-thinking" }
+    agents["librarian"] = { model: "proxypal/gemini-claude-opus-4-5-thinking" }
     agents["explore"] = { model: "proxypal/gemini-3-flash-preview" }
-  } else if (installConfig.hasClaude && installConfig.isMax20) {
-    agents["explore"] = { model: "anthropic/claude-haiku-4-5" }
-  } else {
-    agents["explore"] = { model: "opencode/glm-4.7-free" }
-  }
-
-  if (!installConfig.hasChatGPT) {
-    agents["oracle"] = {
-      model: installConfig.hasClaude ? "anthropic/claude-opus-4-5" : "opencode/glm-4.7-free",
-    }
-  }
-
-  if (installConfig.hasGemini) {
     agents["frontend-ui-ux-engineer"] = { model: "proxypal/gemini-3-pro-preview" }
     agents["document-writer"] = { model: "proxypal/gemini-3-flash-preview" }
     agents["multimodal-looker"] = { model: "proxypal/gemini-3-flash-preview" }
+    agents["orchestrator-sisyphus"] = { model: "proxypal/gemini-claude-sonnet-4-5-thinking" }
+    agents["Prometheus (Planner)"] = { model: "proxypal/gemini-claude-opus-4-5-thinking" }
+    agents["Metis (Plan Consultant)"] = { model: "proxypal/gemini-claude-opus-4-5-thinking" }
+  } else if (installConfig.hasClaude) {
+    agents["Sisyphus"] = { model: "anthropic/claude-opus-4-5" }
+    agents["librarian"] = { model: "anthropic/claude-sonnet-4-5" }
+    agents["explore"] = { model: installConfig.isMax20 ? "anthropic/claude-haiku-4-5" : "opencode/glm-4.7-free" }
+    agents["frontend-ui-ux-engineer"] = { model: "anthropic/claude-opus-4-5" }
+    agents["document-writer"] = { model: "anthropic/claude-opus-4-5" }
+    agents["multimodal-looker"] = { model: "anthropic/claude-opus-4-5" }
   } else {
-    const fallbackModel = installConfig.hasClaude ? "anthropic/claude-opus-4-5" : "opencode/glm-4.7-free"
-    agents["frontend-ui-ux-engineer"] = { model: fallbackModel }
-    agents["document-writer"] = { model: fallbackModel }
-    agents["multimodal-looker"] = { model: fallbackModel }
+    agents["Sisyphus"] = { model: "opencode/glm-4.7-free" }
+    agents["librarian"] = { model: "opencode/glm-4.7-free" }
+    agents["explore"] = { model: "opencode/glm-4.7-free" }
+    agents["frontend-ui-ux-engineer"] = { model: "opencode/glm-4.7-free" }
+    agents["document-writer"] = { model: "opencode/glm-4.7-free" }
+    agents["multimodal-looker"] = { model: "opencode/glm-4.7-free" }
+  }
+
+  if (installConfig.hasChatGPT) {
+    agents["oracle"] = { model: "openai/gpt-5.2-medium" }
+    agents["Momus (Plan Reviewer)"] = { model: "openai/gpt-5.2-medium" }
+  } else if (installConfig.hasClaude) {
+    agents["oracle"] = { model: "anthropic/claude-opus-4-5" }
+    agents["Momus (Plan Reviewer)"] = { model: "anthropic/claude-opus-4-5" }
+  } else {
+    agents["oracle"] = { model: "opencode/glm-4.7-free" }
   }
 
   if (Object.keys(agents).length > 0) {
     config.agents = agents
   }
 
-  // Categories: override model for ProxyPal routing
   if (installConfig.hasGemini) {
     config.categories = {
       "visual-engineering": { model: "proxypal/gemini-3-pro-preview" },
+      ultrabrain: { model: "openai/gpt-5.2-medium" },
       artistry: { model: "proxypal/gemini-3-pro-preview" },
+      quick: { model: "proxypal/gemini-3-flash-preview" },
+      "most-capable": { model: "proxypal/gemini-claude-opus-4-5-thinking" },
       writing: { model: "proxypal/gemini-3-flash-preview" },
+      general: { model: "proxypal/gemini-claude-opus-4-5-thinking" },
+    }
+  } else if (installConfig.hasChatGPT) {
+    config.categories = {
+      ultrabrain: { model: "openai/gpt-5.2-medium" },
     }
   }
 
