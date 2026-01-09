@@ -6,9 +6,11 @@ This document describes how to maintain this fork of oh-my-opencode with integra
 
 ```
 main     ← Your fork with Maestro integration (published to npm)
-dev      ← Syncs with upstream oh-my-opencode (optional sync branch)
 upstream ← Remote pointing to code-yeongyu/oh-my-opencode
 ```
+
+> **IMPORTANT**: Upstream uses `dev` branch as their main development branch, NOT `master`.
+> Always sync from `upstream/dev`, not `upstream/master`.
 
 ## Conflict-Prone Files
 
@@ -42,11 +44,11 @@ git fetch upstream
 ### 2. Check What Changed
 
 ```bash
-# See commits we're missing
-git log main..upstream/master --oneline
+# See commits we're missing (use upstream/dev, NOT upstream/master)
+git log main..upstream/dev --oneline
 
 # See files that will conflict
-git diff main...upstream/master --stat
+git diff main...upstream/dev --stat
 ```
 
 ### 3. Merge with Ours Strategy for Known Files
@@ -55,8 +57,8 @@ git diff main...upstream/master --stat
 # Create a merge branch for safety
 git checkout -b sync-upstream-$(date +%Y%m%d)
 
-# Merge upstream
-git merge upstream/master
+# Merge upstream (use dev branch!)
+git merge upstream/dev
 
 # If conflicts occur, resolve them:
 ```
