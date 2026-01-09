@@ -38,7 +38,7 @@ describe("sisyphus-task", () => {
 
       // #when / #then
       expect(category).toBeDefined()
-      expect(category.model).toBe("google/gemini-3-pro-preview")
+      expect(category.model).toBe("proxypal/gemini-3-pro-preview")
       expect(category.temperature).toBe(0.7)
     })
 
@@ -129,7 +129,7 @@ describe("sisyphus-task", () => {
 
       // #then
       expect(result).not.toBeNull()
-      expect(result!.config.model).toBe("google/gemini-3-pro-preview")
+      expect(result!.config.model).toBe("proxypal/gemini-3-pro-preview")
       expect(result!.promptAppend).toContain("VISUAL/UI")
     })
 

@@ -10,7 +10,7 @@ describe("createBuiltinAgents with model overrides", () => {
     const agents = createBuiltinAgents()
 
     // #then
-    expect(agents.Sisyphus.model).toBe("anthropic/claude-opus-4-5")
+    expect(agents.Sisyphus.model).toBe("proxypal/gemini-claude-opus-4-5-thinking")
     expect(agents.Sisyphus.thinking).toEqual({ type: "enabled", budgetTokens: 32000 })
     expect(agents.Sisyphus.reasoningEffort).toBeUndefined()
   })
@@ -39,7 +39,7 @@ describe("createBuiltinAgents with model overrides", () => {
 
     // #then
     expect(agents.Sisyphus.model).toBe("proxypal/gpt-5.2-codex")
-    expect(agents.Sisyphus.reasoningEffort).toBe("medium")
+    expect(agents.Sisyphus.reasoningEffort).toBe("xhigh")
     expect(agents.Sisyphus.thinking).toBeUndefined()
   })
 
@@ -51,7 +51,7 @@ describe("createBuiltinAgents with model overrides", () => {
 
     // #then
     expect(agents.oracle.model).toBe("proxypal/gpt-5.2-codex")
-    expect(agents.oracle.reasoningEffort).toBe("medium")
+    expect(agents.oracle.reasoningEffort).toBe("xhigh")
     expect(agents.oracle.textVerbosity).toBe("high")
     expect(agents.oracle.thinking).toBeUndefined()
   })
@@ -104,7 +104,7 @@ describe("buildAgent with category and skills", () => {
     const agent = buildAgent(source["test-agent"])
 
     // #then
-    expect(agent.model).toBe("google/gemini-3-pro-preview")
+    expect(agent.model).toBe("proxypal/gemini-3-pro-preview")
     expect(agent.temperature).toBe(0.7)
   })
 

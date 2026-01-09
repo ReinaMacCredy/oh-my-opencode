@@ -53,7 +53,15 @@ export interface AgentPromptMetadata {
 }
 
 export function isGptModel(model: string): boolean {
-  return model.startsWith("openai/") || model.startsWith("github-copilot/gpt-")
+  return model.startsWith("openai/") || model.startsWith("github-copilot/gpt-") || model.includes("/gpt-")
+}
+
+export function isProxyPalGptModel(model: string): boolean {
+  return model.startsWith("proxypal/") && model.includes("gpt-")
+}
+
+export function getGptReasoningEffort(model: string): "medium" | "xhigh" {
+  return isProxyPalGptModel(model) ? "xhigh" : "medium"
 }
 
 export type BuiltinAgentName =

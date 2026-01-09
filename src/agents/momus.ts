@@ -1,6 +1,6 @@
 import type { AgentConfig } from "@opencode-ai/sdk"
 import type { AgentPromptMetadata } from "./types"
-import { isGptModel } from "./types"
+import { isGptModel, getGptReasoningEffort } from "./types"
 import { createAgentToolRestrictions } from "../shared/permission-compat"
 
 /**
@@ -367,7 +367,7 @@ export function createMomusAgent(model: string = DEFAULT_MODEL): AgentConfig {
   } as AgentConfig
 
   if (isGptModel(model)) {
-    return { ...base, reasoningEffort: "medium", textVerbosity: "high" } as AgentConfig
+    return { ...base, reasoningEffort: getGptReasoningEffort(model), textVerbosity: "high" } as AgentConfig
   }
 
   return { ...base, thinking: { type: "enabled", budgetTokens: 32000 } } as AgentConfig
