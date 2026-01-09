@@ -29,15 +29,21 @@ agents/
 
 ## AGENT MODELS
 
-| Agent | Default Model | Fallback | Purpose |
-|-------|---------------|----------|---------|
-| Sisyphus | anthropic/claude-opus-4-5 | - | Primary orchestrator with extended thinking |
-| oracle | proxypal/gpt-5.2-codex | - | Read-only consultation. High-IQ debugging, architecture |
-| librarian | anthropic/claude-sonnet-4-5 | google/gemini-3-flash | Docs, OSS research, GitHub examples |
-| explore | opencode/grok-code | google/gemini-3-flash, anthropic/claude-haiku-4-5 | Fast contextual grep |
-| frontend-ui-ux-engineer | google/gemini-3-pro-preview | - | UI/UX code generation |
-| document-writer | google/gemini-3-pro-preview | - | Technical writing |
-| multimodal-looker | google/gemini-3-flash | - | PDF/image analysis |
+> **Note:** This fork uses ProxyPal models by default for users with ProxyPal subscriptions.
+> For Claude/Anthropic users, models fall back to `anthropic/` prefix.
+
+| Agent | Default Model (ProxyPal) | Fallback | Purpose |
+|-------|--------------------------|----------|---------|
+| Sisyphus | proxypal/gemini-claude-opus-4-5-thinking | anthropic/claude-opus-4-5 | Primary orchestrator with extended thinking |
+| oracle | proxypal/gpt-5.2-codex | anthropic/claude-opus-4-5 | Read-only consultation. High-IQ debugging, architecture |
+| Momus (Plan Reviewer) | proxypal/gpt-5.2-codex | anthropic/claude-opus-4-5 | Expert plan review with rigorous standards |
+| librarian | proxypal/gemini-claude-opus-4-5-thinking | anthropic/claude-sonnet-4-5 | Docs, OSS research, GitHub examples |
+| explore | proxypal/gemini-3-flash-preview | anthropic/claude-haiku-4-5 | Fast contextual grep |
+| frontend-ui-ux-engineer | proxypal/gemini-3-pro-preview | anthropic/claude-opus-4-5 | UI/UX code generation |
+| document-writer | proxypal/gemini-3-flash-preview | anthropic/claude-opus-4-5 | Technical writing |
+| multimodal-looker | proxypal/gemini-3-flash-preview | anthropic/claude-opus-4-5 | PDF/image analysis |
+| orchestrator-sisyphus | proxypal/gemini-claude-sonnet-4-5-thinking | - | Task orchestration and delegation |
+| Sisyphus-Junior | proxypal/gemini-claude-sonnet-4-5-thinking | - | Category-based task execution |
 
 ## HOW TO ADD AN AGENT
 
@@ -74,10 +80,11 @@ agents/
 2. Check installer settings (claude max20, gemini antigravity)
 3. Use default model
 
-**Fallback order for explore**:
+**Fallback order for explore** (ProxyPal fork):
+- If ProxyPal enabled → `proxypal/gemini-3-flash-preview` (default)
 - If gemini antigravity enabled → `google/gemini-3-flash`
 - If claude max20 enabled → `anthropic/claude-haiku-4-5`
-- Default → `opencode/grok-code` (free)
+- Otherwise → `opencode/grok-code` (free)
 
 ## ANTI-PATTERNS (AGENTS)
 
