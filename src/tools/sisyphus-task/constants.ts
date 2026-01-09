@@ -189,7 +189,7 @@ export const DEFAULT_CATEGORIES: Record<string, CategoryConfig> = {
     temperature: 0.7,
   },
   ultrabrain: {
-    model: "openai/gpt-5.2-medium",
+    model: "openai/gpt-5.2",
     temperature: 0.1,
   },
   artistry: {
