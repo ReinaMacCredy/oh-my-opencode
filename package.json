@@ -28,6 +28,10 @@
     "build:schema": "bun run script/build-schema.ts",
     "clean": "rm -rf dist",
     "prepublishOnly": "bun run clean && bun run build",
+    "publish:beta": "./scripts/publish.sh prerelease",
+    "publish:patch": "./scripts/publish.sh patch",
+    "publish:minor": "./scripts/publish.sh minor",
+    "publish:major": "./scripts/publish.sh major",
     "typecheck": "tsc --noEmit",
     "test": "bun test"
   },

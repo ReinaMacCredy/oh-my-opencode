@@ -32,13 +32,13 @@ describe("createBuiltinAgents with model overrides", () => {
 
   test("Sisyphus with systemDefaultModel GPT has reasoningEffort, no thinking", () => {
     // #given
-    const systemDefaultModel = "openai/gpt-5.2"
+    const systemDefaultModel = "proxypal/gpt-5.2-codex"
 
     // #when
     const agents = createBuiltinAgents([], {}, undefined, systemDefaultModel)
 
     // #then
-    expect(agents.Sisyphus.model).toBe("openai/gpt-5.2")
+    expect(agents.Sisyphus.model).toBe("proxypal/gpt-5.2-codex")
     expect(agents.Sisyphus.reasoningEffort).toBe("medium")
     expect(agents.Sisyphus.thinking).toBeUndefined()
   })
@@ -50,7 +50,7 @@ describe("createBuiltinAgents with model overrides", () => {
     const agents = createBuiltinAgents()
 
     // #then
-    expect(agents.oracle.model).toBe("openai/gpt-5.2")
+    expect(agents.oracle.model).toBe("proxypal/gpt-5.2-codex")
     expect(agents.oracle.reasoningEffort).toBe("medium")
     expect(agents.oracle.textVerbosity).toBe("high")
     expect(agents.oracle.thinking).toBeUndefined()
@@ -203,7 +203,7 @@ describe("buildAgent with category and skills", () => {
     const agent = buildAgent(source["test-agent"])
 
     // #then
-    expect(agent.model).toBe("openai/gpt-5.2")
+    expect(agent.model).toBe("proxypal/gpt-5.2-codex")
     expect(agent.temperature).toBe(0.1)
     expect(agent.prompt).toContain("Role: Designer-Turned-Developer")
     expect(agent.prompt).toContain("Task description")

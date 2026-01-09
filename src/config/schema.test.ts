@@ -229,7 +229,7 @@ describe("AgentOverrideConfigSchema", () => {
   describe("backward compatibility", () => {
     test("still accepts model field (deprecated)", () => {
       // #given
-      const config = { model: "openai/gpt-5.2" }
+      const config = { model: "proxypal/gpt-5.2-codex" }
 
       // #when
       const result = AgentOverrideConfigSchema.safeParse(config)
@@ -237,14 +237,14 @@ describe("AgentOverrideConfigSchema", () => {
       // #then
       expect(result.success).toBe(true)
       if (result.success) {
-        expect(result.data.model).toBe("openai/gpt-5.2")
+        expect(result.data.model).toBe("proxypal/gpt-5.2-codex")
       }
     })
 
     test("accepts both model and category (deprecated usage)", () => {
       // #given - category should take precedence at runtime, but both should validate
       const config = { 
-        model: "openai/gpt-5.2",
+        model: "proxypal/gpt-5.2-codex",
         category: "ultrabrain"
       }
 
@@ -254,7 +254,7 @@ describe("AgentOverrideConfigSchema", () => {
       // #then
       expect(result.success).toBe(true)
       if (result.success) {
-        expect(result.data.model).toBe("openai/gpt-5.2")
+        expect(result.data.model).toBe("proxypal/gpt-5.2-codex")
         expect(result.data.category).toBe("ultrabrain")
       }
     })

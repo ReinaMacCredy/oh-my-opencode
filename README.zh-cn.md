@@ -367,7 +367,7 @@ opencode auth login
 要在 `opencode.json` 里配完整的模型设置。
 去读 [opencode-openai-codex-auth 文档](https://github.com/numman-ali/opencode-openai-codex-auth)，从 [`config/opencode-modern.json`](https://github.com/numman-ali/opencode-openai-codex-auth/blob/main/config/opencode-modern.json)（OpenCode v1.0.210+）或 [`config/opencode-legacy.json`](https://github.com/numman-ali/opencode-openai-codex-auth/blob/main/config/opencode-legacy.json)（旧版本）抄 provider/models 配置，动脑子合并，别搞炸了。
 
-**可用模型**：`openai/gpt-5.2`, `openai/gpt-5.2-codex`, `openai/gpt-5.1-codex-max`, `openai/gpt-5.1-codex`, `openai/gpt-5.1-codex-mini`, `openai/gpt-5.1`
+**可用模型**：`proxypal/gpt-5.2-codex`, `proxypal/gpt-5.2-codex-codex`, `openai/gpt-5.1-codex-max`, `openai/gpt-5.1-codex`, `openai/gpt-5.1-codex-mini`, `openai/gpt-5.1`
 
 **Variants**（OpenCode v1.0.210+）：用 `--variant=<none|low|medium|high|xhigh>` 控制推理强度。
 
@@ -465,7 +465,7 @@ gh repo star code-yeongyu/oh-my-opencode
 ### Agents：你的神队友
 
 - **Sisyphus** (`anthropic/claude-opus-4-5`)：**默认 Agent。** OpenCode 专属的强力 AI 编排器。指挥专业子 Agent 搞定复杂任务。主打后台任务委派和 Todo 驱动。用 Claude Opus 4.5 加上扩展思考（32k token 预算），智商拉满。
-- **oracle** (`openai/gpt-5.2`)：架构师、代码审查员、战略家。GPT-5.2 的逻辑推理和深度分析能力不是盖的。致敬 AmpCode。
+- **oracle** (`proxypal/gpt-5.2-codex`)：架构师、代码审查员、战略家。GPT-5.2 的逻辑推理和深度分析能力不是盖的。致敬 AmpCode。
 - **librarian** (`anthropic/claude-sonnet-4-5` 或 `google/gemini-3-flash`)：多仓库分析、查文档、找示例。配置 Antigravity 认证时使用 Gemini 3 Flash，否则使用 Claude Sonnet 4.5 深入理解代码库，GitHub 调研，给出的答案都有据可查。致敬 AmpCode。
 - **explore** (`opencode/grok-code`、`google/gemini-3-flash` 或 `anthropic/claude-haiku-4-5`)：极速代码库扫描、模式匹配。配置 Antigravity 认证时使用 Gemini 3 Flash，Claude max20 可用时使用 Haiku，否则用 Grok。致敬 Claude Code。
 - **frontend-ui-ux-engineer** (`google/gemini-3-pro-preview`)：设计师出身的程序员。UI 做得那是真漂亮。Gemini 写这种创意美观的代码是一绝。
@@ -756,7 +756,7 @@ Agent 爽了，你自然也爽。但我还想直接让你爽。
   /* Agent 覆盖 - 为特定任务自定义模型 */
   "agents": {
     "oracle": {
-      "model": "openai/gpt-5.2"  // 用于战略推理的 GPT
+      "model": "proxypal/gpt-5.2-codex"  // 用于战略推理的 GPT
     },
     "explore": {
       "model": "opencode/grok-code"  // 快速且免费的搜索模型
@@ -917,7 +917,7 @@ Sisyphus Agent 也能自定义：
       "model": "anthropic/claude-opus-4"
     },
     "Prometheus (Planner)": {
-      "model": "openai/gpt-5.2"
+      "model": "proxypal/gpt-5.2-codex"
     },
     "Metis (Plan Consultant)": {
       "model": "anthropic/claude-sonnet-4-5"

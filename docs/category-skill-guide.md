@@ -177,7 +177,7 @@ You can fine-tune categories in `oh-my-opencode.json`.
     
     // 2. Override existing category (change model)
     "visual-engineering": {
-      "model": "openai/gpt-5.2", // Can change model
+      "model": "proxypal/gpt-5.2-codex", // Can change model
       "temperature": 0.8
     },
 

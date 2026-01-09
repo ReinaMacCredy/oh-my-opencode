@@ -105,7 +105,7 @@ describe("parseJsonc", () => {
     const jsonc = `{
       // This is an example config
       "agents": {
-        "oracle": { "model": "openai/gpt-5.2" }, // GPT for strategic reasoning
+        "oracle": { "model": "proxypal/gpt-5.2-codex" }, // GPT for strategic reasoning
       },
       /* Agent overrides */
       "disabled_agents": [],
@@ -118,7 +118,7 @@ describe("parseJsonc", () => {
     }>(jsonc)
 
     //#then
-    expect(result.agents.oracle.model).toBe("openai/gpt-5.2")
+    expect(result.agents.oracle.model).toBe("proxypal/gpt-5.2-codex")
     expect(result.disabled_agents).toEqual([])
   })
 

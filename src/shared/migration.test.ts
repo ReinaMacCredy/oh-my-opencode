@@ -35,7 +35,7 @@ describe("migrateAgentNames", () => {
   test("preserves current agent names unchanged", () => {
     // #given: Config with current agent names
     const agents = {
-      oracle: { model: "openai/gpt-5.2" },
+      oracle: { model: "proxypal/gpt-5.2-codex" },
       librarian: { model: "google/gemini-3-flash" },
       explore: { model: "opencode/grok-code" },
     }
@@ -45,7 +45,7 @@ describe("migrateAgentNames", () => {
 
     // #then: Current names should remain unchanged
     expect(changed).toBe(false)
-    expect(migrated["oracle"]).toEqual({ model: "openai/gpt-5.2" })
+    expect(migrated["oracle"]).toEqual({ model: "proxypal/gpt-5.2-codex" })
     expect(migrated["librarian"]).toEqual({ model: "google/gemini-3-flash" })
     expect(migrated["explore"]).toEqual({ model: "opencode/grok-code" })
   })
@@ -302,7 +302,7 @@ describe("migrateAgentConfigToCategory", () => {
     // #given: Configs for each mapped model
     const configs = [
       { model: "google/gemini-3-pro-preview" },
-      { model: "openai/gpt-5.2" },
+      { model: "proxypal/gpt-5.2-codex" },
       { model: "anthropic/claude-haiku-4-5" },
       { model: "anthropic/claude-opus-4-5" },
       { model: "anthropic/claude-sonnet-4-5" },
@@ -324,7 +324,7 @@ describe("migrateAgentConfigToCategory", () => {
   test("preserves non-model fields during migration", () => {
     // #given: Config with multiple fields
     const config = {
-      model: "openai/gpt-5.2",
+      model: "proxypal/gpt-5.2-codex",
       temperature: 0.1,
       top_p: 0.95,
       maxTokens: 4096,
@@ -460,10 +460,10 @@ describe("migrateConfigFile with backup", () => {
   test("creates backup file with timestamp when migration needed", () => {
     // #given: Config file path and config needing migration
     const testConfigPath = "/tmp/test-config-migration.json"
-    const testConfigContent = globalThis.JSON.stringify({ agents: { oracle: { model: "openai/gpt-5.2" } } }, null, 2)
+    const testConfigContent = globalThis.JSON.stringify({ agents: { oracle: { model: "proxypal/gpt-5.2-codex" } } }, null, 2)
     const rawConfig: Record<string, unknown> = {
       agents: {
-        oracle: { model: "openai/gpt-5.2" },
+        oracle: { model: "proxypal/gpt-5.2-codex" },
       },
     }
 
@@ -498,13 +498,13 @@ describe("migrateConfigFile with backup", () => {
     const rawConfig: Record<string, unknown> = {
       agents: {
         oracle: {
-          model: "openai/gpt-5.2",
+          model: "proxypal/gpt-5.2-codex",
           temperature: 0.1,
         },
       },
     }
 
-    fs.writeFileSync(testConfigPath, globalThis.JSON.stringify({ agents: { oracle: { model: "openai/gpt-5.2" } } }, null, 2))
+    fs.writeFileSync(testConfigPath, globalThis.JSON.stringify({ agents: { oracle: { model: "proxypal/gpt-5.2-codex" } } }, null, 2))
     cleanupPaths.push(testConfigPath)
 
     // #when: Migrate config file
@@ -529,13 +529,13 @@ describe("migrateConfigFile with backup", () => {
     const rawConfig: Record<string, unknown> = {
       agents: {
         oracle: {
-          model: "openai/gpt-5.2",
+          model: "proxypal/gpt-5.2-codex",
           temperature: 0.5,
         },
       },
     }
 
-    fs.writeFileSync(testConfigPath, globalThis.JSON.stringify({ agents: { oracle: { model: "openai/gpt-5.2" } } }, null, 2))
+    fs.writeFileSync(testConfigPath, globalThis.JSON.stringify({ agents: { oracle: { model: "proxypal/gpt-5.2-codex" } } }, null, 2))
     cleanupPaths.push(testConfigPath)
 
     // #when: Migrate config file
@@ -588,7 +588,7 @@ describe("migrateConfigFile with backup", () => {
     const testConfigPath = "/tmp/test-config-multi-agent.json"
     const rawConfig: Record<string, unknown> = {
       agents: {
-        oracle: { model: "openai/gpt-5.2" },
+        oracle: { model: "proxypal/gpt-5.2-codex" },
         librarian: { model: "anthropic/claude-sonnet-4-5" },
         frontend: {
           model: "google/gemini-3-pro-preview",
@@ -602,7 +602,7 @@ describe("migrateConfigFile with backup", () => {
       globalThis.JSON.stringify(
         {
           agents: {
-            oracle: { model: "openai/gpt-5.2" },
+            oracle: { model: "proxypal/gpt-5.2-codex" },
             librarian: { model: "anthropic/claude-sonnet-4-5" },
             frontend: { model: "google/gemini-3-pro-preview" },
           },

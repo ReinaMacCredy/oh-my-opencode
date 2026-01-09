@@ -23,7 +23,7 @@
  * @example
  * extractModelPrefix("vertex_ai/claude-sonnet-4-5") // { prefix: "vertex_ai/", base: "claude-sonnet-4-5" }
  * extractModelPrefix("claude-sonnet-4-5") // { prefix: "", base: "claude-sonnet-4-5" }
- * extractModelPrefix("openai/gpt-5.2") // { prefix: "openai/", base: "gpt-5.2" }
+ * extractModelPrefix("proxypal/gpt-5.2-codex") // { prefix: "openai/", base: "gpt-5.2" }
  */
 function extractModelPrefix(modelID: string): { prefix: string; base: string } {
   const slashIndex = modelID.indexOf("/")
