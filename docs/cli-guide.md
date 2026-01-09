@@ -4,14 +4,14 @@ This document provides a comprehensive guide to using the Oh-My-OpenCode CLI too
 
 ## 1. Overview
 
-Oh-My-OpenCode provides CLI tools accessible via the `bunx oh-my-opencode` command. The CLI supports various features including plugin installation, environment diagnostics, and session execution.
+Oh-My-OpenCode provides CLI tools accessible via the `bunx @reinamaccredy/oh-my-opencode` command. The CLI supports various features including plugin installation, environment diagnostics, and session execution.
 
 ```bash
 # Basic execution (displays help)
-bunx oh-my-opencode
+bunx @reinamaccredy/oh-my-opencode
 
 # Or run with npx
-npx oh-my-opencode
+npx @reinamaccredy/oh-my-opencode
 ```
 
 ---
@@ -35,7 +35,7 @@ An interactive installation tool for initial Oh-My-OpenCode setup. Provides a be
 ### Usage
 
 ```bash
-bunx oh-my-opencode install
+bunx @reinamaccredy/oh-my-opencode install
 ```
 
 ### Installation Process
@@ -61,7 +61,7 @@ Diagnoses your environment to ensure Oh-My-OpenCode is functioning correctly. Pe
 ### Usage
 
 ```bash
-bunx oh-my-opencode doctor
+bunx @reinamaccredy/oh-my-opencode doctor
 ```
 
 ### Diagnostic Categories
@@ -122,7 +122,7 @@ Executes OpenCode sessions and monitors task completion.
 ### Usage
 
 ```bash
-bunx oh-my-opencode run [prompt]
+bunx @reinamaccredy/oh-my-opencode run [prompt]
 ```
 
 ### Options
@@ -142,13 +142,13 @@ Manages Google Antigravity OAuth authentication. Required for using Gemini model
 
 ```bash
 # Login
-bunx oh-my-opencode auth login
+bunx @reinamaccredy/oh-my-opencode auth login
 
 # Logout
-bunx oh-my-opencode auth logout
+bunx @reinamaccredy/oh-my-opencode auth logout
 
 # Check current status
-bunx oh-my-opencode auth status
+bunx @reinamaccredy/oh-my-opencode auth status
 ```
 
 ---
@@ -198,17 +198,17 @@ bun install -g opencode@latest
 
 ```bash
 # Reinstall plugin
-bunx oh-my-opencode install
+bunx @reinamaccredy/oh-my-opencode install
 ```
 
 ### Doctor Check Failures
 
 ```bash
 # Diagnose with detailed information
-bunx oh-my-opencode doctor --verbose
+bunx @reinamaccredy/oh-my-opencode doctor --verbose
 
 # Check specific category only
-bunx oh-my-opencode doctor --category authentication
+bunx @reinamaccredy/oh-my-opencode doctor --category authentication
 ```
 
 ---
@@ -219,10 +219,10 @@ Use the `--no-tui` option for CI/CD environments.
 
 ```bash
 # Run doctor in CI environment
-bunx oh-my-opencode doctor --no-tui --json
+bunx @reinamaccredy/oh-my-opencode doctor --no-tui --json
 
 # Save results to file
-bunx oh-my-opencode doctor --json > doctor-report.json
+bunx @reinamaccredy/oh-my-opencode doctor --json > doctor-report.json
 ```
 
 ---

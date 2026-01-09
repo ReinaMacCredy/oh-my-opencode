@@ -237,9 +237,9 @@ If you don't want all this, as mentioned, you can just pick and choose specific 
 Run the interactive installer:
 
 ```bash
-bunx oh-my-opencode install
+bunx @reinamaccredy/oh-my-opencode install
 # or use npx if bunx doesn't work
-npx oh-my-opencode install
+npx @reinamaccredy/oh-my-opencode install
 ```
 
 > **Note for Ubuntu/Debian users**: If you installed Bun via Snap (`/snap/bin/bun`), `bunx` will fail with "script not found" due to Snap's sandboxing. Either use `npx` instead, or reinstall Bun via the official installer: `curl -fsSL https://bun.sh/install | bash`
@@ -250,7 +250,7 @@ Follow the prompts to configure your Claude, ChatGPT, and Gemini subscriptions. 
 
 Paste this into a fresh opencode session:
 ```
-Install and configure by following the instructions here https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/refs/heads/master/README.md
+Install and configure by following the instructions here https://raw.githubusercontent.com/ReinaMacCredy/oh-my-opencode/refs/heads/main/README.md
 ```
 
 ### For LLM Agents
@@ -299,13 +299,13 @@ Spawn a subagent to handle installation and report back - to save context.
 Based on user's answers, run the CLI installer with appropriate flags:
 
 ```bash
-bunx oh-my-opencode install --no-tui --claude=<yes|no|max20> --chatgpt=<yes|no> --gemini=<yes|no>
+bunx @reinamaccredy/oh-my-opencode install --no-tui --claude=<yes|no|max20> --chatgpt=<yes|no> --gemini=<yes|no>
 ```
 
 **Examples:**
-- User has all subscriptions with max20: `bunx oh-my-opencode install --no-tui --claude=max20 --chatgpt=yes --gemini=yes`
-- User has only Claude (no max20): `bunx oh-my-opencode install --no-tui --claude=yes --chatgpt=no --gemini=no`
-- User has no subscriptions: `bunx oh-my-opencode install --no-tui --claude=no --chatgpt=no --gemini=no`
+- User has all subscriptions with max20: `bunx @reinamaccredy/oh-my-opencode install --no-tui --claude=max20 --chatgpt=yes --gemini=yes`
+- User has only Claude (no max20): `bunx @reinamaccredy/oh-my-opencode install --no-tui --claude=yes --chatgpt=no --gemini=no`
+- User has no subscriptions: `bunx @reinamaccredy/oh-my-opencode install --no-tui --claude=no --chatgpt=no --gemini=no`
 
 The CLI will:
 - Register the plugin in `opencode.json`
