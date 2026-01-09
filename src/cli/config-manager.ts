@@ -279,10 +279,10 @@ export function generateOmoConfig(installConfig: InstallConfig): Record<string, 
 
   agents["librarian"] = { model: "opencode/glm-4.7-free" }
 
-  // Gemini models use `antigravity-` prefix for explicit Antigravity quota routing
+  // Gemini models use `proxypal/` prefix for ProxyPal routing
   // @see ANTIGRAVITY_PROVIDER_CONFIG comments for rationale
   if (installConfig.hasGemini) {
-    agents["explore"] = { model: "google/antigravity-gemini-3-flash" }
+    agents["explore"] = { model: "proxypal/gemini-3-flash-preview" }
   } else if (installConfig.hasClaude && installConfig.isMax20) {
     agents["explore"] = { model: "anthropic/claude-haiku-4-5" }
   } else {
@@ -296,9 +296,9 @@ export function generateOmoConfig(installConfig: InstallConfig): Record<string, 
   }
 
   if (installConfig.hasGemini) {
-    agents["frontend-ui-ux-engineer"] = { model: "google/antigravity-gemini-3-pro-high" }
-    agents["document-writer"] = { model: "google/antigravity-gemini-3-flash" }
-    agents["multimodal-looker"] = { model: "google/antigravity-gemini-3-flash" }
+    agents["frontend-ui-ux-engineer"] = { model: "proxypal/gemini-3-pro-preview" }
+    agents["document-writer"] = { model: "proxypal/gemini-3-flash-preview" }
+    agents["multimodal-looker"] = { model: "proxypal/gemini-3-flash-preview" }
   } else {
     const fallbackModel = installConfig.hasClaude ? "anthropic/claude-opus-4-5" : "opencode/glm-4.7-free"
     agents["frontend-ui-ux-engineer"] = { model: fallbackModel }
@@ -310,12 +310,12 @@ export function generateOmoConfig(installConfig: InstallConfig): Record<string, 
     config.agents = agents
   }
 
-  // Categories: override model for Antigravity auth (gemini-3-pro-preview → gemini-3-pro-high)
+  // Categories: override model for ProxyPal routing
   if (installConfig.hasGemini) {
     config.categories = {
-      "visual-engineering": { model: "google/gemini-3-pro-high" },
-      artistry: { model: "google/gemini-3-pro-high" },
-      writing: { model: "google/gemini-3-flash-high" },
+      "visual-engineering": { model: "proxypal/gemini-3-pro-preview" },
+      artistry: { model: "proxypal/gemini-3-pro-preview" },
+      writing: { model: "proxypal/gemini-3-flash-preview" },
     }
   }
 

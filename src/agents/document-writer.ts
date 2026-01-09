@@ -2,7 +2,7 @@ import type { AgentConfig } from "@opencode-ai/sdk"
 import type { AgentPromptMetadata } from "./types"
 import { createAgentToolRestrictions } from "../shared/permission-compat"
 
-const DEFAULT_MODEL = "google/gemini-3-flash-preview"
+const DEFAULT_MODEL = "proxypal/gemini-3-flash-preview"
 
 export const DOCUMENT_WRITER_PROMPT_METADATA: AgentPromptMetadata = {
   category: "specialist",
