@@ -28,6 +28,18 @@ export const HOOK_NAME_MAP: Record<string, string> = {
   "anthropic-auto-compact": "anthropic-context-window-limit-recovery",
 }
 
+// Migration map: google/ → proxypal/ model names
+// Users who installed with older versions may have google/gemini-* models
+// that need to be migrated to proxypal/gemini-* equivalents.
+export const GOOGLE_TO_PROXYPAL_MODEL_MAP: Record<string, string> = {
+  "google/gemini-3-pro-preview": "proxypal/gemini-3-pro-preview",
+  "google/gemini-3-flash-preview": "proxypal/gemini-3-flash-preview",
+  "google/gemini-3-flash": "proxypal/gemini-3-flash-preview",
+  "google/gemini-3-pro": "proxypal/gemini-3-pro-preview",
+  "google/gemini-3-pro-high": "proxypal/gemini-3-pro-preview",
+  "google/gemini-3-pro-low": "proxypal/gemini-3-pro-preview",
+}
+
 // Model to category mapping for auto-migration
 // NOTE: This fork uses proxypal/ prefix instead of google/ for Gemini models.
 // When merging from upstream, replace google/gemini-* with proxypal/gemini-* equivalents.
@@ -37,6 +49,29 @@ export const MODEL_TO_CATEGORY_MAP: Record<string, string> = {
   "proxypal/gemini-3-flash-preview": "quick",
   "proxypal/gemini-claude-opus-4-5-thinking": "most-capable",
   "proxypal/gemini-claude-sonnet-4-5-thinking": "general",
+}
+
+export function migrateGoogleToProxypalModel(model: string): { migrated: string; changed: boolean } {
+  const proxypalModel = GOOGLE_TO_PROXYPAL_MODEL_MAP[model]
+  if (proxypalModel) {
+    return { migrated: proxypalModel, changed: true }
+  }
+  return { migrated: model, changed: false }
+}
+
+export function migrateModelsInConfig(config: Record<string, unknown>): { migrated: Record<string, unknown>; changed: boolean } {
+  let changed = false
+  const migrated = { ...config }
+
+  if (typeof migrated.model === "string") {
+    const { migrated: newModel, changed: modelChanged } = migrateGoogleToProxypalModel(migrated.model)
+    if (modelChanged) {
+      migrated.model = newModel
+      changed = true
+    }
+  }
+
+  return { migrated, changed }
 }
 
 export function migrateAgentNames(agents: Record<string, unknown>): { migrated: Record<string, unknown>; changed: boolean } {
@@ -116,6 +151,28 @@ export function migrateConfigFile(configPath: string, rawConfig: Record<string, 
     if (changed) {
       rawConfig.agents = migrated
       needsWrite = true
+    }
+  }
+
+  if (rawConfig.agents && typeof rawConfig.agents === "object") {
+    const agents = rawConfig.agents as Record<string, Record<string, unknown>>
+    for (const [name, config] of Object.entries(agents)) {
+      const { migrated, changed } = migrateModelsInConfig(config)
+      if (changed) {
+        agents[name] = migrated
+        needsWrite = true
+      }
+    }
+  }
+
+  if (rawConfig.categories && typeof rawConfig.categories === "object") {
+    const categories = rawConfig.categories as Record<string, Record<string, unknown>>
+    for (const [name, config] of Object.entries(categories)) {
+      const { migrated, changed } = migrateModelsInConfig(config)
+      if (changed) {
+        categories[name] = migrated
+        needsWrite = true
+      }
     }
   }
 

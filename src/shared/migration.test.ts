@@ -4,11 +4,14 @@ import * as path from "path"
 import {
   AGENT_NAME_MAP,
   HOOK_NAME_MAP,
+  GOOGLE_TO_PROXYPAL_MODEL_MAP,
   migrateAgentNames,
   migrateHookNames,
   migrateConfigFile,
   migrateAgentConfigToCategory,
   shouldDeleteAgentConfig,
+  migrateGoogleToProxypalModel,
+  migrateModelsInConfig,
 } from "./migration"
 
 describe("migrateAgentNames", () => {
@@ -628,6 +631,202 @@ describe("migrateConfigFile with backup", () => {
     expect(agents.frontend).toBeDefined()
     expect((agents.frontend as Record<string, unknown>).category).toBe("visual-engineering")
     expect((agents.frontend as Record<string, unknown>).temperature).toBe(0.9)
+
+    const dir = path.dirname(testConfigPath)
+    const basename = path.basename(testConfigPath)
+    const files = fs.readdirSync(dir)
+    const backupFiles = files.filter((f) => f.startsWith(`${basename}.bak.`))
+    backupFiles.forEach((f) => cleanupPaths.push(path.join(dir, f)))
+  })
+})
+
+describe("GOOGLE_TO_PROXYPAL_MODEL_MAP", () => {
+  test("contains all expected google/ to proxypal/ mappings", () => {
+    expect(GOOGLE_TO_PROXYPAL_MODEL_MAP["google/gemini-3-pro-preview"]).toBe("proxypal/gemini-3-pro-preview")
+    expect(GOOGLE_TO_PROXYPAL_MODEL_MAP["google/gemini-3-flash-preview"]).toBe("proxypal/gemini-3-flash-preview")
+    expect(GOOGLE_TO_PROXYPAL_MODEL_MAP["google/gemini-3-flash"]).toBe("proxypal/gemini-3-flash-preview")
+    expect(GOOGLE_TO_PROXYPAL_MODEL_MAP["google/gemini-3-pro"]).toBe("proxypal/gemini-3-pro-preview")
+    expect(GOOGLE_TO_PROXYPAL_MODEL_MAP["google/gemini-3-pro-high"]).toBe("proxypal/gemini-3-pro-preview")
+    expect(GOOGLE_TO_PROXYPAL_MODEL_MAP["google/gemini-3-pro-low"]).toBe("proxypal/gemini-3-pro-preview")
+  })
+})
+
+describe("migrateGoogleToProxypalModel", () => {
+  test("migrates google/gemini-3-pro-preview to proxypal/gemini-3-pro-preview", () => {
+    const { migrated, changed } = migrateGoogleToProxypalModel("google/gemini-3-pro-preview")
+    expect(changed).toBe(true)
+    expect(migrated).toBe("proxypal/gemini-3-pro-preview")
+  })
+
+  test("migrates google/gemini-3-flash to proxypal/gemini-3-flash-preview", () => {
+    const { migrated, changed } = migrateGoogleToProxypalModel("google/gemini-3-flash")
+    expect(changed).toBe(true)
+    expect(migrated).toBe("proxypal/gemini-3-flash-preview")
+  })
+
+  test("preserves proxypal/ models unchanged", () => {
+    const { migrated, changed } = migrateGoogleToProxypalModel("proxypal/gemini-3-pro-preview")
+    expect(changed).toBe(false)
+    expect(migrated).toBe("proxypal/gemini-3-pro-preview")
+  })
+
+  test("preserves unknown google/ models unchanged", () => {
+    const { migrated, changed } = migrateGoogleToProxypalModel("google/unknown-model")
+    expect(changed).toBe(false)
+    expect(migrated).toBe("google/unknown-model")
+  })
+
+  test("preserves non-google models unchanged", () => {
+    const { migrated, changed } = migrateGoogleToProxypalModel("anthropic/claude-opus-4-5")
+    expect(changed).toBe(false)
+    expect(migrated).toBe("anthropic/claude-opus-4-5")
+  })
+})
+
+describe("migrateModelsInConfig", () => {
+  test("migrates model field in config object", () => {
+    const config = {
+      model: "google/gemini-3-pro-preview",
+      temperature: 0.7,
+    }
+
+    const { migrated, changed } = migrateModelsInConfig(config)
+
+    expect(changed).toBe(true)
+    expect(migrated.model).toBe("proxypal/gemini-3-pro-preview")
+    expect(migrated.temperature).toBe(0.7)
+  })
+
+  test("preserves config when model is already proxypal/", () => {
+    const config = {
+      model: "proxypal/gemini-3-pro-preview",
+      temperature: 0.7,
+    }
+
+    const { migrated, changed } = migrateModelsInConfig(config)
+
+    expect(changed).toBe(false)
+    expect(migrated.model).toBe("proxypal/gemini-3-pro-preview")
+  })
+
+  test("preserves config when model is not a string", () => {
+    const config = {
+      temperature: 0.7,
+    }
+
+    const { migrated, changed } = migrateModelsInConfig(config)
+
+    expect(changed).toBe(false)
+    expect(migrated).toEqual(config)
+  })
+})
+
+describe("migrateConfigFile with google/ models", () => {
+  const cleanupPaths: string[] = []
+
+  afterEach(() => {
+    cleanupPaths.forEach((p) => {
+      try {
+        fs.unlinkSync(p)
+      } catch {
+      }
+    })
+  })
+
+  test("migrates google/ models in agents to proxypal/ before category migration", () => {
+    const testConfigPath = "/tmp/test-config-google-model.json"
+    const rawConfig: Record<string, unknown> = {
+      agents: {
+        "frontend-ui-ux-engineer": { model: "google/gemini-3-pro-preview", temperature: 0.9 },
+        "document-writer": { model: "google/gemini-3-flash", temperature: 0.5 },
+      },
+    }
+
+    fs.writeFileSync(testConfigPath, globalThis.JSON.stringify(rawConfig, null, 2))
+    cleanupPaths.push(testConfigPath)
+
+    const needsWrite = migrateConfigFile(testConfigPath, rawConfig)
+
+    expect(needsWrite).toBe(true)
+
+    const agents = rawConfig.agents as Record<string, Record<string, unknown>>
+    expect(agents["frontend-ui-ux-engineer"].category).toBe("visual-engineering")
+    expect(agents["frontend-ui-ux-engineer"].temperature).toBe(0.9)
+    expect(agents["frontend-ui-ux-engineer"].model).toBeUndefined()
+    expect(agents["document-writer"].category).toBe("quick")
+    expect(agents["document-writer"].temperature).toBe(0.5)
+    expect(agents["document-writer"].model).toBeUndefined()
+
+    const dir = path.dirname(testConfigPath)
+    const basename = path.basename(testConfigPath)
+    const files = fs.readdirSync(dir)
+    const backupFiles = files.filter((f) => f.startsWith(`${basename}.bak.`))
+    backupFiles.forEach((f) => cleanupPaths.push(path.join(dir, f)))
+  })
+
+  test("migrates google/ models in categories to proxypal/", () => {
+    const testConfigPath = "/tmp/test-config-google-category.json"
+    const rawConfig: Record<string, unknown> = {
+      categories: {
+        "visual-engineering": { model: "google/gemini-3-pro-preview", temperature: 0.7 },
+      },
+    }
+
+    fs.writeFileSync(testConfigPath, globalThis.JSON.stringify(rawConfig, null, 2))
+    cleanupPaths.push(testConfigPath)
+
+    const needsWrite = migrateConfigFile(testConfigPath, rawConfig)
+
+    expect(needsWrite).toBe(true)
+
+    const categories = rawConfig.categories as Record<string, Record<string, unknown>>
+    expect(categories["visual-engineering"].model).toBe("proxypal/gemini-3-pro-preview")
+    expect(categories["visual-engineering"].temperature).toBe(0.7)
+
+    const dir = path.dirname(testConfigPath)
+    const basename = path.basename(testConfigPath)
+    const files = fs.readdirSync(dir)
+    const backupFiles = files.filter((f) => f.startsWith(`${basename}.bak.`))
+    backupFiles.forEach((f) => cleanupPaths.push(path.join(dir, f)))
+  })
+
+  test("does not migrate unknown google/ models", () => {
+    const testConfigPath = "/tmp/test-config-google-unknown.json"
+    const rawConfig: Record<string, unknown> = {
+      agents: {
+        "custom-agent": { model: "google/unknown-model" },
+      },
+    }
+
+    fs.writeFileSync(testConfigPath, globalThis.JSON.stringify(rawConfig, null, 2))
+    cleanupPaths.push(testConfigPath)
+
+    const needsWrite = migrateConfigFile(testConfigPath, rawConfig)
+
+    expect(needsWrite).toBe(false)
+
+    const agents = rawConfig.agents as Record<string, Record<string, unknown>>
+    expect(agents["custom-agent"].model).toBe("google/unknown-model")
+  })
+
+  test("does not migrate when models are already proxypal/ and have custom settings", () => {
+    const testConfigPath = "/tmp/test-config-proxypal.json"
+    const rawConfig: Record<string, unknown> = {
+      agents: {
+        "custom-agent": { model: "proxypal/gemini-claude-opus-4-5-thinking", prompt_append: "custom prompt" },
+      },
+    }
+
+    fs.writeFileSync(testConfigPath, globalThis.JSON.stringify(rawConfig, null, 2))
+    cleanupPaths.push(testConfigPath)
+
+    const needsWrite = migrateConfigFile(testConfigPath, rawConfig)
+
+    expect(needsWrite).toBe(true)
+
+    const agents = rawConfig.agents as Record<string, Record<string, unknown>>
+    expect(agents["custom-agent"].category).toBe("most-capable")
+    expect(agents["custom-agent"].prompt_append).toBe("custom prompt")
 
     const dir = path.dirname(testConfigPath)
     const basename = path.basename(testConfigPath)
