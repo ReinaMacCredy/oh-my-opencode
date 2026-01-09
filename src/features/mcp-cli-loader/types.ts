@@ -1,4 +1,4 @@
-export type McpCliScope = "opencode" | "project" | "claude"
+export type McpCliScope = "user" | "opencode" | "project" | "claude"
 
 export interface McpCliServerConfig {
   command: string

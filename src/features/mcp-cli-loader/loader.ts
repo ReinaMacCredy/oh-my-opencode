@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs"
 import { join } from "node:path"
+import { homedir } from "node:os"
 import { expandEnvVarsInObject } from "../../shared/env-expander"
 import type {
   McpCliConfig,
@@ -15,8 +16,10 @@ interface McpCliConfigPath {
 
 function getMcpCliConfigPaths(): McpCliConfigPath[] {
   const cwd = process.cwd()
+  const home = homedir()
 
   return [
+    { path: join(home, ".config", "opencode", "mcp_servers.json"), scope: "user" },
     { path: join(cwd, ".claude", "mcp_servers.json"), scope: "claude" },
     { path: join(cwd, "mcp_servers.json"), scope: "project" },
     { path: join(cwd, ".opencode", "mcp_servers.json"), scope: "opencode" },
