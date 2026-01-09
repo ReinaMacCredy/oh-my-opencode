@@ -1,6 +1,6 @@
 {
   "name": "@reinamaccredy/oh-my-opencode",
-  "version": "3.0.1-beta.0",
+  "version": "3.0.1-beta.1",
   "description": "Fork of oh-my-opencode with Maestro workflow integration - Multi-Model Orchestration, Parallel Background Agents, Design Phases, and TDD Methodology",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
