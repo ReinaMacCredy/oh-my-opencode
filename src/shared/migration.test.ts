@@ -660,7 +660,7 @@ describe("migrateConfigFile with google/ models", () => {
     })
   })
 
-  test("migrates google/ models in agents to proxypal/ before category migration", () => {
+  test("migrates google/ models in agents to proxypal/", () => {
     const testConfigPath = "/tmp/test-config-google-model.json"
     const rawConfig: Record<string, unknown> = {
       agents: {
@@ -677,12 +677,10 @@ describe("migrateConfigFile with google/ models", () => {
     expect(needsWrite).toBe(true)
 
     const agents = rawConfig.agents as Record<string, Record<string, unknown>>
-    expect(agents["frontend-ui-ux-engineer"].category).toBe("visual-engineering")
+    expect(agents["frontend-ui-ux-engineer"].model).toBe("proxypal/gemini-3-pro-preview")
     expect(agents["frontend-ui-ux-engineer"].temperature).toBe(0.9)
-    expect(agents["frontend-ui-ux-engineer"].model).toBeUndefined()
-    expect(agents["document-writer"].category).toBe("quick")
+    expect(agents["document-writer"].model).toBe("proxypal/gemini-3-flash-preview")
     expect(agents["document-writer"].temperature).toBe(0.5)
-    expect(agents["document-writer"].model).toBeUndefined()
 
     const dir = path.dirname(testConfigPath)
     const basename = path.basename(testConfigPath)
@@ -736,7 +734,7 @@ describe("migrateConfigFile with google/ models", () => {
     expect(agents["custom-agent"].model).toBe("google/unknown-model")
   })
 
-  test("does not migrate when models are already proxypal/ and have custom settings", () => {
+  test("does not migrate proxypal models with custom settings", () => {
     const testConfigPath = "/tmp/test-config-proxypal.json"
     const rawConfig: Record<string, unknown> = {
       agents: {
@@ -749,16 +747,10 @@ describe("migrateConfigFile with google/ models", () => {
 
     const needsWrite = migrateConfigFile(testConfigPath, rawConfig)
 
-    expect(needsWrite).toBe(true)
+    expect(needsWrite).toBe(false)
 
     const agents = rawConfig.agents as Record<string, Record<string, unknown>>
-    expect(agents["custom-agent"].category).toBe("most-capable")
+    expect(agents["custom-agent"].model).toBe("proxypal/gemini-claude-opus-4-5-thinking")
     expect(agents["custom-agent"].prompt_append).toBe("custom prompt")
-
-    const dir = path.dirname(testConfigPath)
-    const basename = path.basename(testConfigPath)
-    const files = fs.readdirSync(dir)
-    const backupFiles = files.filter((f) => f.startsWith(`${basename}.bak.`))
-    backupFiles.forEach((f) => cleanupPaths.push(path.join(dir, f)))
   })
 })
