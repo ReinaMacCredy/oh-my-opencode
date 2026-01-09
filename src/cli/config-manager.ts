@@ -300,8 +300,8 @@ export function generateOmoConfig(installConfig: InstallConfig): Record<string, 
   }
 
   if (installConfig.hasChatGPT) {
-    agents["oracle"] = { model: "openai/gpt-5.2" }
-    agents["Momus (Plan Reviewer)"] = { model: "openai/gpt-5.2" }
+    agents["oracle"] = { model: "proxypal/gpt-5.2-codex" }
+    agents["Momus (Plan Reviewer)"] = { model: "proxypal/gpt-5.2-codex" }
   } else if (installConfig.hasClaude) {
     agents["oracle"] = { model: "anthropic/claude-opus-4-5" }
     agents["Momus (Plan Reviewer)"] = { model: "anthropic/claude-opus-4-5" }
@@ -316,7 +316,7 @@ export function generateOmoConfig(installConfig: InstallConfig): Record<string, 
   if (installConfig.hasGemini) {
     config.categories = {
       "visual-engineering": { model: "proxypal/gemini-3-pro-preview" },
-      ultrabrain: { model: "openai/gpt-5.2" },
+      ultrabrain: { model: "proxypal/gpt-5.2-codex" },
       artistry: { model: "proxypal/gemini-3-pro-preview" },
       quick: { model: "proxypal/gemini-3-flash-preview" },
       "most-capable": { model: "proxypal/gemini-claude-opus-4-5-thinking" },
@@ -325,7 +325,7 @@ export function generateOmoConfig(installConfig: InstallConfig): Record<string, 
     }
   } else if (installConfig.hasChatGPT) {
     config.categories = {
-      ultrabrain: { model: "openai/gpt-5.2" },
+      ultrabrain: { model: "proxypal/gpt-5.2-codex" },
     }
   }
 

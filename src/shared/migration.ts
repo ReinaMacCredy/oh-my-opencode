@@ -33,7 +33,7 @@ export const HOOK_NAME_MAP: Record<string, string> = {
 // When merging from upstream, replace google/gemini-* with proxypal/gemini-* equivalents.
 export const MODEL_TO_CATEGORY_MAP: Record<string, string> = {
   "proxypal/gemini-3-pro-preview": "visual-engineering",
-  "openai/gpt-5.2": "ultrabrain",
+  "proxypal/gpt-5.2-codex": "ultrabrain",
   "proxypal/gemini-3-flash-preview": "quick",
   "proxypal/gemini-claude-opus-4-5-thinking": "most-capable",
   "proxypal/gemini-claude-sonnet-4-5-thinking": "general",

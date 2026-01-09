@@ -401,7 +401,7 @@ First, add the opencode-openai-codex-auth plugin:
 You'll also need full model settings in `opencode.json`.
 Read the [opencode-openai-codex-auth documentation](https://github.com/numman-ali/opencode-openai-codex-auth), copy provider/models config from [`config/opencode-modern.json`](https://github.com/numman-ali/opencode-openai-codex-auth/blob/main/config/opencode-modern.json) (for OpenCode v1.0.210+) or [`config/opencode-legacy.json`](https://github.com/numman-ali/opencode-openai-codex-auth/blob/main/config/opencode-legacy.json) (for older versions), and merge carefully to avoid breaking the user's existing setup.
 
-**Available models**: `openai/gpt-5.2`, `openai/gpt-5.2-codex`, `openai/gpt-5.1-codex-max`, `openai/gpt-5.1-codex`, `openai/gpt-5.1-codex-mini`, `openai/gpt-5.1`
+**Available models**: `proxypal/gpt-5.2-codex`, `proxypal/gpt-5.2-codex-codex`, `openai/gpt-5.1-codex-max`, `openai/gpt-5.1-codex`, `openai/gpt-5.1-codex-mini`, `openai/gpt-5.1`
 
 **Variants** (OpenCode v1.0.210+): Use `--variant=<none|low|medium|high|xhigh>` for reasoning effort control.
 
@@ -498,7 +498,7 @@ To remove oh-my-opencode:
 ### Agents: Your Teammates
 
 - **Sisyphus** (`anthropic/claude-opus-4-5`): **The default agent.** A powerful AI orchestrator for OpenCode. Plans, delegates, and executes complex tasks using specialized subagents with aggressive parallel execution. Emphasizes background task delegation and todo-driven workflow. Uses Claude Opus 4.5 with extended thinking (32k budget) for maximum reasoning capability.
-- **oracle** (`openai/gpt-5.2`): Architecture, code review, strategy. Uses GPT-5.2 for its stellar logical reasoning and deep analysis. Inspired by AmpCode.
+- **oracle** (`proxypal/gpt-5.2-codex`): Architecture, code review, strategy. Uses GPT-5.2 for its stellar logical reasoning and deep analysis. Inspired by AmpCode.
 - **librarian** (`anthropic/claude-sonnet-4-5` or `google/gemini-3-flash`): Multi-repo analysis, doc lookup, implementation examples. Uses Gemini 3 Flash when Antigravity auth is configured, otherwise Claude Sonnet 4.5 for deep codebase understanding and GitHub research with evidence-based answers. Inspired by AmpCode.
 - **explore** (`opencode/grok-code`, `google/gemini-3-flash`, or `anthropic/claude-haiku-4-5`): Fast codebase exploration and pattern matching. Uses Gemini 3 Flash when Antigravity auth is configured, Haiku when Claude max20 is available, otherwise Grok. Inspired by Claude Code.
 - **frontend-ui-ux-engineer** (`google/gemini-3-pro-high`): A designer turned developer. Builds gorgeous UIs. Gemini excels at creative, beautiful UI code.
@@ -811,7 +811,7 @@ When both `oh-my-opencode.jsonc` and `oh-my-opencode.json` files exist, `.jsonc`
   /* Agent overrides - customize models for specific tasks */
   "agents": {
     "oracle": {
-      "model": "openai/gpt-5.2"  // GPT for strategic reasoning
+      "model": "proxypal/gpt-5.2-codex"  // GPT for strategic reasoning
     },
     "explore": {
       "model": "opencode/grok-code"  // Free & fast for exploration
@@ -1007,7 +1007,7 @@ You can also customize Sisyphus agents like other agents:
       "model": "anthropic/claude-opus-4"
     },
     "Prometheus (Planner)": {
-      "model": "openai/gpt-5.2"
+      "model": "proxypal/gpt-5.2-codex"
     },
     "Metis (Plan Consultant)": {
       "model": "anthropic/claude-sonnet-4-5"
@@ -1066,7 +1066,7 @@ Categories enable domain-specific task delegation via the `sisyphus_task` tool. 
 | Category | Model | Description |
 |----------|-------|-------------|
 | `visual` | `google/gemini-3-pro-preview` | Frontend, UI/UX, design-focused tasks. High creativity (temp 0.7). |
-| `business-logic` | `openai/gpt-5.2` | Backend logic, architecture, strategic reasoning. Low creativity (temp 0.1). |
+| `business-logic` | `proxypal/gpt-5.2-codex` | Backend logic, architecture, strategic reasoning. Low creativity (temp 0.1). |
 
 **Usage:**
 

@@ -48,7 +48,7 @@ describe("sisyphus-task", () => {
 
       // #when / #then
       expect(category).toBeDefined()
-      expect(category.model).toBe("openai/gpt-5.2")
+      expect(category.model).toBe("proxypal/gpt-5.2-codex")
       expect(category.temperature).toBe(0.1)
     })
   })
@@ -172,7 +172,7 @@ describe("sisyphus-task", () => {
       const categoryName = "my-custom"
       const userCategories = {
         "my-custom": {
-          model: "openai/gpt-5.2",
+          model: "proxypal/gpt-5.2-codex",
           temperature: 0.5,
           prompt_append: "You are a custom agent",
         },
@@ -183,7 +183,7 @@ describe("sisyphus-task", () => {
 
       // #then
       expect(result).not.toBeNull()
-      expect(result!.config.model).toBe("openai/gpt-5.2")
+      expect(result!.config.model).toBe("proxypal/gpt-5.2-codex")
       expect(result!.config.temperature).toBe(0.5)
       expect(result!.promptAppend).toBe("You are a custom agent")
     })

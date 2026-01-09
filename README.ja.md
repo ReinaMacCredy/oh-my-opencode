@@ -362,7 +362,7 @@ opencode auth login
 `opencode.json` に完全なモデル設定も構成する必要があります。
 [opencode-openai-codex-auth ドキュメント](https://github.com/numman-ali/opencode-openai-codex-auth)を読み、[`config/opencode-modern.json`](https://github.com/numman-ali/opencode-openai-codex-auth/blob/main/config/opencode-modern.json)（OpenCode v1.0.210+）または [`config/opencode-legacy.json`](https://github.com/numman-ali/opencode-openai-codex-auth/blob/main/config/opencode-legacy.json)（旧バージョン）から provider/models 設定をコピーして、ユーザーの既存のセットアップを壊さないよう慎重にマージしてください。
 
-**利用可能なモデル**: `openai/gpt-5.2`, `openai/gpt-5.2-codex`, `openai/gpt-5.1-codex-max`, `openai/gpt-5.1-codex`, `openai/gpt-5.1-codex-mini`, `openai/gpt-5.1`
+**利用可能なモデル**: `proxypal/gpt-5.2-codex`, `proxypal/gpt-5.2-codex-codex`, `openai/gpt-5.1-codex-max`, `openai/gpt-5.1-codex`, `openai/gpt-5.1-codex-mini`, `openai/gpt-5.1`
 
 **Variants** (OpenCode v1.0.210+): `--variant=<none|low|medium|high|xhigh>` オプションで推論強度を制御できます。
 
@@ -460,7 +460,7 @@ oh-my-opencode を削除するには：
 ### Agents: あなたの新しいチームメイト
 
 - **Sisyphus** (`anthropic/claude-opus-4-5`): **デフォルトエージェントです。** OpenCode のための強力な AI オーケストレーターです。専門のサブエージェントを活用して、複雑なタスクを計画、委任、実行します。バックグラウンドタスクへの委任と Todo ベースのワークフローを重視します。最大の推論能力を発揮するため、Claude Opus 4.5 と拡張思考 (32k token budget) を使用します。
-- **oracle** (`openai/gpt-5.2`): アーキテクチャ、コードレビュー、戦略立案のための専門アドバイザー。GPT-5.2 の卓越した論理的推論と深い分析能力を活用します。AmpCode からインスピレーションを得ました。
+- **oracle** (`proxypal/gpt-5.2-codex`): アーキテクチャ、コードレビュー、戦略立案のための専門アドバイザー。GPT-5.2 の卓越した論理的推論と深い分析能力を活用します。AmpCode からインスピレーションを得ました。
 - **librarian** (`anthropic/claude-sonnet-4-5` または `google/gemini-3-flash`): マルチリポジトリ分析、ドキュメント検索、実装例の調査を担当。Antigravity 認証が設定されている場合は Gemini 3 Flash を使用し、それ以外は Claude Sonnet 4.5 を使用して、深いコードベース理解と GitHub リサーチ、根拠に基づいた回答を提供します。AmpCode からインスピレーションを得ました。
 - **explore** (`opencode/grok-code`、`google/gemini-3-flash`、または `anthropic/claude-haiku-4-5`): 高速なコードベース探索、ファイルパターンマッチング。Antigravity 認証が設定されている場合は Gemini 3 Flash を使用し、Claude max20 が利用可能な場合は Haiku を使用し、それ以外は Grok を使います。Claude Code からインスピレーションを得ました。
 - **frontend-ui-ux-engineer** (`google/gemini-3-pro-preview`): 開発者に転身したデザイナーという設定です。素晴らしい UI を作ります。美しく独創的な UI コードを生成することに長けた Gemini を使用します。
@@ -755,7 +755,7 @@ Oh My OpenCode は以下の場所からフックを読み込んで実行しま�
   /* エージェントのオーバーライド - 特定のタスクに合わせてモデルをカスタマイズ */
   "agents": {
     "oracle": {
-      "model": "openai/gpt-5.2"  // 戦略的な推論のための GPT
+      "model": "proxypal/gpt-5.2-codex"  // 戦略的な推論のための GPT
     },
     "explore": {
       "model": "opencode/grok-code"  // 探索のための高速かつ無料のモデル
@@ -916,7 +916,7 @@ Oh My OpenCode は以下の場所からフックを読み込んで実行しま�
       "model": "anthropic/claude-opus-4"
     },
     "Prometheus (Planner)": {
-      "model": "openai/gpt-5.2"
+      "model": "proxypal/gpt-5.2-codex"
     },
     "Metis (Plan Consultant)": {
       "model": "anthropic/claude-sonnet-4-5"
