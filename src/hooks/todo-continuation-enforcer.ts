@@ -36,6 +36,8 @@ interface SessionState {
   countdownInterval?: ReturnType<typeof setInterval>
   isRecovering?: boolean
   countdownStartedAt?: number
+  injectionFailed?: boolean
+  consecutiveFailures?: number
 }
 
 const CONTINUATION_PROMPT = `[SYSTEM REMINDER - TODO CONTINUATION]
@@ -151,10 +153,15 @@ export function createTodoContinuationEnforcer(
   }
 
   async function injectContinuation(sessionID: string, incompleteCount: number, total: number): Promise<void> {
-    const state = sessions.get(sessionID)
+    const sessionState = getState(sessionID)
 
-    if (state?.isRecovering) {
+    if (sessionState.isRecovering) {
       log(`[${HOOK_NAME}] Skipped injection: in recovery`, { sessionID })
+      return
+    }
+
+    if (sessionState.injectionFailed) {
+      log(`[${HOOK_NAME}] Skipped injection: previous injection permanently failed`, { sessionID })
       return
     }
 
@@ -208,7 +215,6 @@ export function createTodoContinuationEnforcer(
     try {
       log(`[${HOOK_NAME}] Injecting continuation`, { sessionID, agent: prevMessage?.agent, incompleteCount: freshIncompleteCount })
 
-      // Don't pass model - let OpenCode use session's existing lastModel
       await ctx.client.session.prompt({
         path: { id: sessionID },
         body: {
@@ -218,9 +224,38 @@ export function createTodoContinuationEnforcer(
         query: { directory: ctx.directory },
       })
 
+      sessionState.consecutiveFailures = 0
       log(`[${HOOK_NAME}] Injection successful`, { sessionID })
     } catch (err) {
-      log(`[${HOOK_NAME}] Injection failed`, { sessionID, error: String(err) })
+      const errorStr = String(err)
+      const isProviderError = errorStr.includes("ProviderModelNotFoundError") ||
+                              errorStr.includes("ProviderNotFoundError") ||
+                              errorStr.includes("provider") && errorStr.includes("not found")
+
+      sessionState.consecutiveFailures = (sessionState.consecutiveFailures ?? 0) + 1
+
+      if (isProviderError || sessionState.consecutiveFailures >= 3) {
+        sessionState.injectionFailed = true
+        log(`[${HOOK_NAME}] Injection permanently failed - stopping retries`, {
+          sessionID,
+          error: errorStr,
+          isProviderError,
+          consecutiveFailures: sessionState.consecutiveFailures,
+        })
+
+        await ctx.client.tui.showToast({
+          body: {
+            title: "Todo Continuation Error",
+            message: isProviderError
+              ? "Model not found. Check your provider configuration."
+              : "Failed to continue after 3 attempts. Please continue manually.",
+            variant: "error" as const,
+            duration: 5000,
+          },
+        }).catch(() => {})
+      } else {
+        log(`[${HOOK_NAME}] Injection failed (attempt ${sessionState.consecutiveFailures}/3)`, { sessionID, error: errorStr })
+      }
     }
   }
 

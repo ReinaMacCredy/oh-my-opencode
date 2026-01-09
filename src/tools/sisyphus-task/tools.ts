@@ -72,7 +72,7 @@ function resolveCategoryConfig(
   const config: CategoryConfig = {
     ...defaultConfig,
     ...userConfig,
-    model: userConfig?.model ?? defaultConfig?.model ?? "anthropic/claude-sonnet-4-5",
+    model: userConfig?.model ?? defaultConfig?.model ?? "proxypal/gemini-claude-sonnet-4-5-thinking",
   }
 
   let promptAppend = defaultPromptAppend
