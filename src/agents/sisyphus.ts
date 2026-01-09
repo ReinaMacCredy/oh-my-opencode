@@ -1,5 +1,5 @@
 import type { AgentConfig } from "@opencode-ai/sdk"
-import { isGptModel } from "./types"
+import { isGptModel, getGptReasoningEffort } from "./types"
 import type { AvailableAgent, AvailableTool, AvailableSkill } from "./sisyphus-prompt-builder"
 import {
   buildKeyTriggersSection,
@@ -631,7 +631,7 @@ export function createSisyphusAgent(
   }
 
   if (isGptModel(model)) {
-    return { ...base, reasoningEffort: "medium" }
+    return { ...base, reasoningEffort: getGptReasoningEffort(model) }
   }
 
   return { ...base, thinking: { type: "enabled", budgetTokens: 32000 } }

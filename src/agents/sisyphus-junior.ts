@@ -1,5 +1,5 @@
 import type { AgentConfig } from "@opencode-ai/sdk"
-import { isGptModel } from "./types"
+import { isGptModel, getGptReasoningEffort } from "./types"
 import type { CategoryConfig } from "../config/schema"
 import {
   createAgentToolRestrictions,
@@ -121,7 +121,7 @@ export function createSisyphusJuniorAgent(
   }
 
   if (isGptModel(model)) {
-    return { ...base, reasoningEffort: "medium" } as AgentConfig
+    return { ...base, reasoningEffort: getGptReasoningEffort(model) } as AgentConfig
   }
 
   return {

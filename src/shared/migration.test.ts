@@ -252,7 +252,7 @@ describe("migrateAgentConfigToCategory", () => {
   test("migrates model to category when mapping exists", () => {
     // #given: Config with a model that has a category mapping
     const config = {
-      model: "google/gemini-3-pro-preview",
+      model: "proxypal/gemini-3-pro-preview",
       temperature: 0.5,
       top_p: 0.9,
     }
@@ -299,13 +299,13 @@ describe("migrateAgentConfigToCategory", () => {
   })
 
   test("handles all mapped models correctly", () => {
-    // #given: Configs for each mapped model
+    // #given: Configs for each mapped model (using proxypal/ prefix)
     const configs = [
-      { model: "google/gemini-3-pro-preview" },
+      { model: "proxypal/gemini-3-pro-preview" },
       { model: "proxypal/gpt-5.2-codex" },
-      { model: "anthropic/claude-haiku-4-5" },
-      { model: "anthropic/claude-opus-4-5" },
-      { model: "anthropic/claude-sonnet-4-5" },
+      { model: "proxypal/gemini-3-flash-preview" },
+      { model: "proxypal/gemini-claude-opus-4-5-thinking" },
+      { model: "proxypal/gemini-claude-sonnet-4-5-thinking" },
     ]
 
     const expectedCategories = ["visual-engineering", "ultrabrain", "quick", "most-capable", "general"]
@@ -367,10 +367,10 @@ describe("shouldDeleteAgentConfig", () => {
   })
 
   test("returns true when all fields match category defaults", () => {
-    // #given: Config with fields matching category defaults
+    // #given: Config with fields matching category defaults (proxypal model)
     const config = {
       category: "visual-engineering",
-      model: "google/gemini-3-pro-preview",
+      model: "proxypal/gemini-3-pro-preview",
       temperature: 0.7,
     }
 
@@ -584,14 +584,14 @@ describe("migrateConfigFile with backup", () => {
   })
 
   test("handles multiple agent migrations correctly", () => {
-    // #given: Config with multiple agents needing migration
+    // #given: Config with multiple agents needing migration (proxypal models)
     const testConfigPath = "/tmp/test-config-multi-agent.json"
     const rawConfig: Record<string, unknown> = {
       agents: {
         oracle: { model: "proxypal/gpt-5.2-codex" },
-        librarian: { model: "anthropic/claude-sonnet-4-5" },
+        librarian: { model: "proxypal/gemini-claude-sonnet-4-5-thinking" },
         frontend: {
-          model: "google/gemini-3-pro-preview",
+          model: "proxypal/gemini-3-pro-preview",
           temperature: 0.9,
         },
       },
@@ -603,8 +603,8 @@ describe("migrateConfigFile with backup", () => {
         {
           agents: {
             oracle: { model: "proxypal/gpt-5.2-codex" },
-            librarian: { model: "anthropic/claude-sonnet-4-5" },
-            frontend: { model: "google/gemini-3-pro-preview" },
+            librarian: { model: "proxypal/gemini-claude-sonnet-4-5-thinking" },
+            frontend: { model: "proxypal/gemini-3-pro-preview" },
           },
         },
         null,
