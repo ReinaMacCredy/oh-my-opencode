@@ -38,7 +38,12 @@
     "librarian",
     "agents",
     "ai",
-    "llm"
+    "llm",
+    "maestro",
+    "workflow",
+    "tdd",
+    "design-phases",
+    "multi-agent"
   ],
   "author": "YeonGyu-Kim",
   "license": "SUL-1.0",

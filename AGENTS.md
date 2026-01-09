@@ -1,12 +1,12 @@
 # PROJECT KNOWLEDGE BASE
 
-**Generated:** 2026-01-02T22:41:22+09:00
-**Commit:** d0694e5
-**Branch:** dev
+**Package:** `@reinamaccredy/oh-my-opencode`
+**Fork of:** `oh-my-opencode` by code-yeongyu
+**Branch:** main
 
 ## OVERVIEW
 
-OpenCode plugin implementing Claude Code/AmpCode features. Multi-model agent orchestration (GPT-5.2, Claude, Gemini, Grok), LSP tools (11), AST-Grep search, MCP integrations (context7, websearch_exa, grep_app). "oh-my-zsh" for OpenCode.
+OpenCode plugin implementing Claude Code/AmpCode features with **integrated Maestro workflow skills**. Multi-model agent orchestration (GPT-5.2, Claude, Gemini, Grok), LSP tools (11), AST-Grep search, MCP integrations (context7, websearch_exa, grep_app), and **Maestro design/implementation methodology** (10-phase pipeline, TDD, parallel execution). "oh-my-zsh" for OpenCode with structured workflow support.
 
 ## STRUCTURE
 
@@ -17,6 +17,12 @@ oh-my-opencode/
 │   ├── hooks/         # 22 lifecycle hooks - see src/hooks/AGENTS.md
 │   ├── tools/         # LSP, AST-Grep, Grep, Glob, session mgmt - see src/tools/AGENTS.md
 │   ├── features/      # Claude Code compat layer - see src/features/AGENTS.md
+│   │   ├── workflow-engine/    # Maestro workflow abstraction layer
+│   │   │   ├── contracts/v1/   # WorkflowEngineContract_v1, types, 55 tests
+│   │   │   ├── adapters/       # SisyphusAdapter, MaestroAdapter
+│   │   │   └── engines/        # MaestroEngine (layered plugin)
+│   │   ├── builtin-skills/     # Maestro skills: designing, conductor, orchestrator, tracking
+│   │   └── opencode-skill-loader/  # Auto-prepends maestro-core for Maestro skills
 │   ├── auth/          # Google Antigravity OAuth - see src/auth/AGENTS.md
 │   ├── shared/        # Cross-cutting utilities - see src/shared/AGENTS.md
 │   ├── cli/           # CLI installer, doctor - see src/cli/AGENTS.md
@@ -25,8 +31,25 @@ oh-my-opencode/
 │   └── index.ts       # Main plugin entry (464 lines)
 ├── script/            # build-schema.ts, publish.ts, generate-changelog.ts
 ├── assets/            # JSON schema
+├── FORK_MAINTENANCE.md # Fork sync and conflict resolution guide
 └── dist/              # Build output (ESM + .d.ts)
 ```
+
+## MAESTRO WORKFLOW SKILLS
+
+Built-in Maestro methodology skills integrated as TypeScript templates:
+
+| Skill | Triggers | Purpose |
+|-------|----------|---------|
+| `maestro-core` | (auto-loaded) | Skill hierarchy, routing table, fallback policies |
+| `designing` | `ds`, `cn` | 10-phase Double Diamond design pipeline |
+| `conductor` | `ci`, `ca` | TDD implementation execution |
+| `orchestrator` | `co` | Multi-agent parallel execution with Agent Mail |
+| `tracking` | `bd`, `fb`, `rb` | Beads issue tracker for persistent memory |
+
+**Auto-prepend**: When any Maestro skill loads, `maestro-core` is automatically prepended.
+
+**Location**: `src/features/builtin-skills/skills.ts`
 
 ## WHERE TO LOOK
 
@@ -37,6 +60,8 @@ oh-my-opencode/
 | Add tool | `src/tools/` | Dir with index/types/constants/tools.ts, add to builtinTools |
 | Add MCP | `src/mcp/` | Create config, add to index.ts and types.ts |
 | Add skill | `src/features/builtin-skills/` | Create skill dir with SKILL.md |
+| Maestro skills | `src/features/builtin-skills/skills.ts` | Edit template strings (maestro-core, designing, conductor, orchestrator, tracking) |
+| Workflow engine | `src/features/workflow-engine/` | Contracts, adapters, engines for workflow abstraction |
 | LSP behavior | `src/tools/lsp/` | client.ts (connection), tools.ts (handlers) |
 | AST-Grep | `src/tools/ast-grep/` | napi.ts for @ast-grep/napi binding |
 | Google OAuth | `src/auth/antigravity/` | OAuth plugin for Google/Gemini models |
