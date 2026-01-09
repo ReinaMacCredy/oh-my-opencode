@@ -1,8 +1,11 @@
 import { writeFileSync, mkdirSync, existsSync } from "node:fs"
 import { join } from "node:path"
-import type { McpCliConfig, McpCliServerConfig } from "./types"
-import type { SkillMcpConfig } from "../skill-mcp-manager/types"
-import type { ClaudeCodeMcpServer } from "../claude-code-mcp-loader/types"
+import type {
+  McpCliConfig,
+  McpCliServerConfig,
+  SkillMcpConfig,
+  ClaudeCodeMcpServer,
+} from "./types"
 
 interface SkillWithMcp {
   name: string

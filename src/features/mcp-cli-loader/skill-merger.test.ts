@@ -1,10 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach } from "bun:test"
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync, readFileSync } from "node:fs"
-import { join } from "node:path"
-import { tmpdir } from "node:os"
 import { mergeSkillMcpsIntoConfig, getMergedConfigPath } from "./skill-merger"
-import type { McpCliConfig } from "./types"
-import type { SkillMcpConfig } from "../skill-mcp-manager/types"
+import { existsSync, rmSync, mkdtempSync, readFileSync } from "fs"
+import { join } from "path"
+import { tmpdir } from "os"
+import type { McpCliConfig, SkillMcpConfig } from "./types"
 
 describe("skill MCP merger", () => {
   let tempDir: string

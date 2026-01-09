@@ -46,7 +46,6 @@ import {
   mergeSkills,
 } from "./features/opencode-skill-loader";
 import { createBuiltinSkills } from "./features/builtin-skills";
-import { getSystemMcpServerNames } from "./features/claude-code-mcp-loader";
 import {
   setMainSession,
   getMainSessionID,
@@ -57,7 +56,6 @@ import {
   createBackgroundTools,
   createLookAt,
   createSkillTool,
-  createSkillMcpTool,
   createSlashcommandTool,
   discoverCommandsSync,
   sessionExists,
@@ -66,7 +64,6 @@ import {
   startTmuxCheck,
 } from "./tools";
 import { BackgroundManager } from "./features/background-agent";
-import { SkillMcpManager } from "./features/skill-mcp-manager";
 import { initTaskToastManager } from "./features/task-toast-manager";
 import { type HookName } from "./config";
 import { log, detectExternalNotificationPlugin, getNotificationConflictWarning } from "./shared";
@@ -247,15 +244,8 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
     userCategories: pluginConfig.categories,
   });
   const disabledSkills = new Set(pluginConfig.disabled_skills ?? []);
-  const systemMcpNames = getSystemMcpServerNames();
   const builtinSkills = createBuiltinSkills().filter((skill) => {
-    if (disabledSkills.has(skill.name as never)) return false;
-    if (skill.mcpConfig) {
-      for (const mcpName of Object.keys(skill.mcpConfig)) {
-        if (systemMcpNames.has(mcpName)) return false;
-      }
-    }
-    return true;
+    return !disabledSkills.has(skill.name as never);
   });
   const includeClaudeSkills = pluginConfig.claude_code?.skills !== false;
   const [userSkills, globalSkills, projectSkills, opencodeProjectSkills] = await Promise.all([
@@ -272,17 +262,8 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
     projectSkills,
     opencodeProjectSkills
   );
-  const skillMcpManager = new SkillMcpManager();
-  const getSessionIDForMcp = () => getMainSessionID() || "";
   const skillTool = createSkillTool({
     skills: mergedSkills,
-    mcpManager: skillMcpManager,
-    getSessionID: getSessionIDForMcp,
-  });
-  const skillMcpTool = createSkillMcpTool({
-    manager: skillMcpManager,
-    getLoadedSkills: () => mergedSkills,
-    getSessionID: getSessionIDForMcp,
   });
 
   const commands = discoverCommandsSync();
@@ -310,7 +291,6 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
       look_at: lookAt,
       sisyphus_task: sisyphusTask,
       skill: skillTool,
-      skill_mcp: skillMcpTool,
       slashcommand: slashcommandTool,
       interactive_bash,
     },
@@ -428,9 +408,6 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
         const sessionInfo = props?.info as { id?: string } | undefined;
         if (sessionInfo?.id === getMainSessionID()) {
           setMainSession(undefined);
-        }
-        if (sessionInfo?.id) {
-          await skillMcpManager.disconnectSession(sessionInfo.id);
         }
       }
 

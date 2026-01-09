@@ -17,9 +17,7 @@ import {
   loadUserAgents,
   loadProjectAgents,
 } from "../features/claude-code-agent-loader";
-import { loadMcpConfigs } from "../features/claude-code-mcp-loader";
 import { loadAllPluginComponents } from "../features/claude-code-plugin-loader";
-import { createBuiltinMcps } from "../mcp";
 import type { OhMyOpenCodeConfig } from "../config";
 import { log } from "../shared";
 import { migrateAgentConfig } from "../shared/permission-compat";
@@ -276,14 +274,8 @@ export function createConfigHandler(deps: ConfigHandlerDeps) {
       external_directory: "allow",
     };
 
-    const mcpResult = (pluginConfig.claude_code?.mcp ?? true)
-      ? await loadMcpConfigs()
-      : { servers: {} };
-
     config.mcp = {
       ...(config.mcp as Record<string, unknown>),
-      ...createBuiltinMcps(pluginConfig.disabled_mcps),
-      ...mcpResult.servers,
       ...pluginComponents.mcpServers,
     };
 

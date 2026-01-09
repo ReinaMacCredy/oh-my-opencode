@@ -1,4 +1,4 @@
-import type { SkillMcpConfig } from "../skill-mcp-manager/types"
+import type { SkillMcpConfig } from "../mcp-cli-loader/types"
 
 export interface BuiltinSkill {
   name: string

@@ -6,12 +6,11 @@ import { parseFrontmatter } from "../../shared/frontmatter"
 import { sanitizeModelField } from "../../shared/model-sanitizer"
 import { isMarkdownFile, resolveSymlink } from "../../shared/file-utils"
 import { log } from "../../shared/logger"
-import { expandEnvVarsInObject } from "../claude-code-mcp-loader/env-expander"
-import { transformMcpServer } from "../claude-code-mcp-loader/transformer"
+import { expandEnvVarsInObject } from "../../shared/env-expander"
 import type { CommandDefinition, CommandFrontmatter } from "../claude-code-command-loader/types"
 import type { SkillMetadata } from "../opencode-skill-loader/types"
 import type { AgentFrontmatter } from "../claude-code-agent-loader/types"
-import type { ClaudeCodeMcpConfig, McpServerConfig } from "../claude-code-mcp-loader/types"
+import type { ClaudeCodeMcpConfig, McpServerConfig } from "../mcp-cli-loader/types"
 import type {
   InstalledPluginsDatabase,
   PluginInstallation,
@@ -24,6 +23,10 @@ import type {
   ClaudeSettings,
   PluginLoaderOptions,
 } from "./types"
+
+function transformMcpServer(name: string, server: McpServerConfig): McpServerConfig {
+  return server
+}
 
 const CLAUDE_PLUGIN_ROOT_VAR = "${CLAUDE_PLUGIN_ROOT}"
 

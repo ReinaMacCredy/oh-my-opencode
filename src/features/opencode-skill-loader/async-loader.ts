@@ -7,7 +7,7 @@ import { sanitizeModelField } from "../../shared/model-sanitizer"
 import { resolveSymlink, isMarkdownFile } from "../../shared/file-utils"
 import type { CommandDefinition } from "../claude-code-command-loader/types"
 import type { SkillScope, SkillMetadata, LoadedSkill } from "./types"
-import type { SkillMcpConfig } from "../skill-mcp-manager/types"
+import type { SkillMcpConfig } from "../mcp-cli-loader/types"
 
 export async function mapWithConcurrency<T, R>(
   items: T[],
