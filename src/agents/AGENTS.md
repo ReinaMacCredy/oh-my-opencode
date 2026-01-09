@@ -77,12 +77,12 @@ agents/
 `createBuiltinAgents()` in utils.ts handles model fallback:
 
 1. Check user config override (`agents.{name}.model`)
-2. Check installer settings (claude max20, gemini antigravity)
+2. Check installer settings (claude max20, gemini proxypal)
 3. Use default model
 
 **Fallback order for explore** (ProxyPal fork):
 - If ProxyPal enabled → `proxypal/gemini-3-flash-preview` (default)
-- If gemini antigravity enabled → `google/gemini-3-flash`
+- If gemini proxypal enabled → `google/gemini-3-flash`
 - If claude max20 enabled → `anthropic/claude-haiku-4-5`
 - Otherwise → `opencode/grok-code` (free)
 

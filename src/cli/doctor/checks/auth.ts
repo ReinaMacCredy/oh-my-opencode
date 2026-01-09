@@ -12,7 +12,7 @@ const OPENCODE_JSONC = join(OPENCODE_CONFIG_DIR, "opencode.jsonc")
 const AUTH_PLUGINS: Record<AuthProviderId, { plugin: string; name: string }> = {
   anthropic: { plugin: "builtin", name: "Anthropic (Claude)" },
   openai: { plugin: "opencode-openai-codex-auth", name: "OpenAI (ChatGPT)" },
-  google: { plugin: "opencode-antigravity-auth", name: "Google (Gemini)" },
+  google: { plugin: "opencode-proxypal-auth", name: "Google (Gemini)" },
 }
 
 function getOpenCodeConfig(): { plugin?: string[] } | null {

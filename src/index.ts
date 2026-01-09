@@ -30,13 +30,14 @@ import {
   createStartWorkHook,
   createSisyphusOrchestratorHook,
   createPrometheusMdOnlyHook,
+  createMaestroSisyphusBridgeHook,
+  createTddEnforcementHook,
 } from "./hooks";
 import {
   contextCollector,
   createContextInjectorHook,
   createContextInjectorMessagesTransformHook,
 } from "./features/context-injector";
-import { createGoogleAntigravityAuthPlugin } from "./auth/antigravity";
 import {
   discoverUserClaudeSkills,
   discoverProjectClaudeSkills,
@@ -204,6 +205,14 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
     ? createSisyphusOrchestratorHook(ctx)
     : null;
 
+  const tddEnforcement = isHookEnabled("tdd-enforcement")
+    ? createTddEnforcementHook(ctx, pluginConfig.maestro)
+    : null;
+
+  const maestroSisyphusBridge = isHookEnabled("maestro-sisyphus-bridge")
+    ? createMaestroSisyphusBridgeHook(ctx, pluginConfig.maestro)
+    : null;
+
   const prometheusMdOnly = isHookEnabled("prometheus-md-only")
     ? createPrometheusMdOnlyHook(ctx)
     : null;
@@ -286,10 +295,6 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
     ? createAutoSlashCommandHook({ skills: mergedSkills })
     : null;
 
-  const googleAuthHooks = pluginConfig.google_auth !== false
-    ? await createGoogleAntigravityAuthPlugin(ctx)
-    : null;
-
   const configHandler = createConfigHandler({
     ctx,
     pluginConfig,
@@ -297,7 +302,6 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
   });
 
   return {
-    ...(googleAuthHooks ? { auth: googleAuthHooks.auth } : {}),
 
     tool: {
       ...builtinTools,

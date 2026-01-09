@@ -9,6 +9,7 @@ export {
   SisyphusAgentConfigSchema,
   ExperimentalConfigSchema,
   RalphLoopConfigSchema,
+  MaestroConfigSchema,
 } from "./schema"
 
 export type {
@@ -23,4 +24,5 @@ export type {
   ExperimentalConfig,
   DynamicContextPruningConfig,
   RalphLoopConfig,
+  MaestroConfig,
 } from "./schema"

@@ -44,7 +44,6 @@ function formatConfigSummary(config: InstallConfig): string {
     const claudeDetail = config.hasClaude ? (config.isMax20 ? "max20" : "standard") : undefined
     lines.push(formatProvider("Claude", config.hasClaude, claudeDetail))
     lines.push(formatProvider("ChatGPT", config.hasChatGPT))
-    lines.push(formatProvider("Gemini", config.hasGemini))
   }
 
   lines.push("")
@@ -64,12 +63,6 @@ function formatConfigSummary(config: InstallConfig): string {
     oracleModel = "gpt-5.2-codex"
     librarianModel = "gemini-claude-opus-4-5-thinking"
     frontendModel = "gemini-3-pro-preview"
-  } else if (config.hasGemini) {
-    sisyphusModel = "gemini-claude-opus-4-5-thinking"
-    oracleModel = config.hasChatGPT ? "gpt-5.2-codex" : (config.hasClaude ? "claude-opus-4-5" : "glm-4.7-free")
-    librarianModel = "gemini-claude-opus-4-5-thinking"
-    frontendModel = "gemini-3-pro-preview"
-  } else if (config.hasClaude) {
     sisyphusModel = "claude-opus-4-5"
     oracleModel = config.hasChatGPT ? "gpt-5.2-codex" : "claude-opus-4-5"
     librarianModel = "claude-sonnet-4-5"
@@ -162,11 +155,6 @@ function validateNonTuiArgs(args: InstallArgs): { valid: boolean; errors: string
     errors.push(`Invalid --chatgpt value: ${args.chatgpt} (expected: no, yes)`)
   }
 
-  if (args.gemini === undefined) {
-    errors.push("--gemini is required (values: no, yes)")
-  } else if (!["no", "yes"].includes(args.gemini)) {
-    errors.push(`Invalid --gemini value: ${args.gemini} (expected: no, yes)`)
-  }
 
   return { valid: errors.length === 0, errors }
 }
@@ -187,11 +175,11 @@ function argsToConfig(args: InstallArgs): InstallConfig {
     hasClaude: args.claude !== "no",
     isMax20: args.claude === "max20",
     hasChatGPT: args.chatgpt === "yes",
-    hasGemini: args.gemini === "yes",
+    hasGemini: false,
   }
 }
 
-function detectedToInitialValues(detected: DetectedConfig): { proxypal: BooleanArg; claude: ClaudeSubscription; chatgpt: BooleanArg; gemini: BooleanArg } {
+function detectedToInitialValues(detected: DetectedConfig): { proxypal: BooleanArg; claude: ClaudeSubscription; chatgpt: BooleanArg } {
   let claude: ClaudeSubscription = "no"
   if (detected.hasClaude) {
     claude = detected.isMax20 ? "max20" : "yes"
@@ -201,7 +189,6 @@ function detectedToInitialValues(detected: DetectedConfig): { proxypal: BooleanA
     proxypal: detected.hasProxyPal ? "yes" : "no",
     claude,
     chatgpt: detected.hasChatGPT ? "yes" : "no",
-    gemini: detected.hasGemini ? "yes" : "no",
   }
 }
 
@@ -261,26 +248,12 @@ async function runTuiMode(detected: DetectedConfig): Promise<InstallConfig | nul
     return null
   }
 
-  const gemini = await p.select({
-    message: "Will you integrate Google Gemini?",
-    options: [
-      { value: "no" as const, label: "No", hint: "Frontend/docs agents will use fallback" },
-      { value: "yes" as const, label: "Yes", hint: "Beautiful UI generation with Gemini 3 Pro" },
-    ],
-    initialValue: initial.gemini,
-  })
-
-  if (p.isCancel(gemini)) {
-    p.cancel("Installation cancelled.")
-    return null
-  }
-
   return {
     hasProxyPal: false,
     hasClaude: claude !== "no",
     isMax20: claude === "max20",
     hasChatGPT: chatgpt === "yes",
-    hasGemini: gemini === "yes",
+    hasGemini: false,
   }
 }
 
@@ -294,7 +267,7 @@ async function runNonTuiInstall(args: InstallArgs): Promise<number> {
     }
     console.log()
     printInfo("Usage: bunx oh-my-opencode install --no-tui --proxypal=yes")
-    printInfo("   or: bunx oh-my-opencode install --no-tui --claude=<no|yes|max20> --chatgpt=<no|yes> --gemini=<no|yes>")
+    printInfo("   or: bunx oh-my-opencode install --no-tui --claude=<no|yes|max20> --chatgpt=<no|yes>")
     console.log()
     return 1
   }
@@ -323,7 +296,7 @@ async function runNonTuiInstall(args: InstallArgs): Promise<number> {
     if (initial.proxypal === "yes") {
       printInfo(`Current config: ProxyPal=yes`)
     } else {
-      printInfo(`Current config: Claude=${initial.claude}, ChatGPT=${initial.chatgpt}, Gemini=${initial.gemini}`)
+      printInfo(`Current config: Claude=${initial.claude}, ChatGPT=${initial.chatgpt}`)
     }
   }
 
@@ -346,7 +319,7 @@ async function runNonTuiInstall(args: InstallArgs): Promise<number> {
     }
     printSuccess(`ProxyPal configured ${SYMBOLS.arrow} ${color.dim(providerResult.configPath)}`)
     step += 1
-  } else if (config.hasGemini || config.hasChatGPT) {
+  } else if (config.hasChatGPT) {
     printStep(step++, totalSteps, "Adding auth plugins...")
     const authResult = await addAuthPlugins(config)
     if (!authResult.success) {
@@ -376,7 +349,7 @@ async function runNonTuiInstall(args: InstallArgs): Promise<number> {
 
   printBox(formatConfigSummary(config), isUpdate ? "Updated Configuration" : "Installation Complete")
 
-  if (!config.hasProxyPal && !config.hasClaude && !config.hasChatGPT && !config.hasGemini) {
+  if (!config.hasProxyPal && !config.hasClaude && !config.hasChatGPT) {
     printWarning("No model providers configured. Using opencode/glm-4.7-free as fallback.")
   }
 
@@ -386,7 +359,7 @@ async function runNonTuiInstall(args: InstallArgs): Promise<number> {
     console.log(`  ${SYMBOLS.arrow} Start ProxyPal and ensure proxy is running on ${color.cyan("http://localhost:8317")}`)
     console.log(`  ${SYMBOLS.arrow} Authenticate your providers in ProxyPal app`)
     console.log()
-  } else if ((config.hasClaude || config.hasChatGPT || config.hasGemini) && !args.skipAuth) {
+  } else if ((config.hasClaude || config.hasChatGPT) && !args.skipAuth) {
     console.log(color.bold("Next Steps - Authenticate your providers:"))
     console.log()
     if (config.hasClaude) {
@@ -395,9 +368,7 @@ async function runNonTuiInstall(args: InstallArgs): Promise<number> {
     if (config.hasChatGPT) {
       console.log(`  ${SYMBOLS.arrow} ${color.dim("opencode auth login")} ${color.gray("(select OpenAI → ChatGPT Plus/Pro)")}`)
     }
-    if (config.hasGemini) {
-      console.log(`  ${SYMBOLS.arrow} ${color.dim("opencode auth login")} ${color.gray("(select Google → OAuth with Antigravity)")}`)
-    }
+
     console.log()
   }
 
@@ -436,7 +407,7 @@ export async function install(args: InstallArgs): Promise<number> {
     if (initial.proxypal === "yes") {
       p.log.info(`Existing configuration detected: ProxyPal=yes`)
     } else {
-      p.log.info(`Existing configuration detected: Claude=${initial.claude}, ChatGPT=${initial.chatgpt}, Gemini=${initial.gemini}`)
+      p.log.info(`Existing configuration detected: Claude=${initial.claude}, ChatGPT=${initial.chatgpt}`)
     }
   }
 
@@ -476,7 +447,7 @@ export async function install(args: InstallArgs): Promise<number> {
       return 1
     }
     s.stop(`ProxyPal configured to ${color.cyan(providerResult.configPath)}`)
-  } else if (config.hasGemini || config.hasChatGPT) {
+  } else if (config.hasChatGPT) {
     s.start("Adding auth plugins (fetching latest versions)")
     const authResult = await addAuthPlugins(config)
     if (!authResult.success) {
@@ -505,7 +476,7 @@ export async function install(args: InstallArgs): Promise<number> {
   }
   s.stop(`Config written to ${color.cyan(omoResult.configPath)}`)
 
-  if (!config.hasProxyPal && !config.hasClaude && !config.hasChatGPT && !config.hasGemini) {
+  if (!config.hasProxyPal && !config.hasClaude && !config.hasChatGPT) {
     p.log.warn("No model providers configured. Using opencode/glm-4.7-free as fallback.")
   }
 
@@ -517,7 +488,7 @@ export async function install(args: InstallArgs): Promise<number> {
       `Authenticate your providers in the ProxyPal app`,
     ]
     p.note(steps.join("\n"), "Next Steps - Configure ProxyPal")
-  } else if ((config.hasClaude || config.hasChatGPT || config.hasGemini) && !args.skipAuth) {
+  } else if ((config.hasClaude || config.hasChatGPT) && !args.skipAuth) {
     const steps: string[] = []
     if (config.hasClaude) {
       steps.push(`${color.dim("opencode auth login")} ${color.gray("(select Anthropic → Claude Pro/Max)")}`)
@@ -525,9 +496,7 @@ export async function install(args: InstallArgs): Promise<number> {
     if (config.hasChatGPT) {
       steps.push(`${color.dim("opencode auth login")} ${color.gray("(select OpenAI → ChatGPT Plus/Pro)")}`)
     }
-    if (config.hasGemini) {
-      steps.push(`${color.dim("opencode auth login")} ${color.gray("(select Google → OAuth with Antigravity)")}`)
-    }
+
     p.note(steps.join("\n"), "Next Steps - Authenticate your providers")
   }
 

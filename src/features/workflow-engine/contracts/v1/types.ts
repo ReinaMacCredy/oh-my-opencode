@@ -368,6 +368,7 @@ export interface DesignSessionState {
 export type WorkflowEvent =
   | { type: "plan:created"; plan: WorkflowPlan }
   | { type: "plan:updated"; plan: WorkflowPlan }
+  | { type: "plan:ready"; planPath: string; planName: string; autoExecute?: boolean }
   | { type: "task:created"; task: WorkflowTask }
   | { type: "task:updated"; task: WorkflowTask; previousStatus: TaskStatus }
   | { type: "task:completed"; task: WorkflowTask }
@@ -377,6 +378,7 @@ export type WorkflowEvent =
   | { type: "design:phase-changed"; phase: DesignPhase; previousPhase?: DesignPhase }
   | { type: "execution:started"; mode: ExecutionMode; trackIds: string[] }
   | { type: "execution:completed"; success: boolean; summary?: string }
+  | { type: "execution:requested"; planPath: string; triggeredBy: "maestro" | "prometheus" | "manual" }
   | { type: "handoff:created"; payload: HandoffPayload }
 
 /**

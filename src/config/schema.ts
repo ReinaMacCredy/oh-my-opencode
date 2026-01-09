@@ -86,6 +86,8 @@ export const HookNameSchema = z.enum([
   "prometheus-md-only",
   "start-work",
   "sisyphus-orchestrator",
+  "maestro-sisyphus-bridge",
+  "tdd-enforcement",
 ])
 
 export const BuiltinCommandNameSchema = z.enum([
@@ -290,11 +292,36 @@ export const NotificationConfigSchema = z.object({
   force_enable: z.boolean().optional(),
 })
 
+
 export const GitMasterConfigSchema = z.object({
   /** Add "Ultraworked with Sisyphus" footer to commit messages (default: true) */
   commit_footer: z.boolean().default(true),
   /** Add "Co-authored-by: Sisyphus" trailer to commit messages (default: true) */
   include_co_authored_by: z.boolean().default(true),
+})
+
+export const MaestroConfigSchema = z.object({
+  /** Automatically start Sisyphus execution when Prometheus creates a plan (default: false) */
+  autoExecute: z.boolean().default(false),
+  /** Use Maestro design phases (10-phase Double Diamond pipeline) (default: true) */
+  useDesignPhases: z.boolean().default(true),
+  /** Use Maestro tracking (Beads integration) (default: true) */
+  useTracking: z.boolean().default(true),
+  /** Preferred execution mode: maestro (with TDD gates) or sisyphus (direct) (default: maestro) */
+  preferredExecutionMode: z.enum(["maestro", "sisyphus"]).default("maestro"),
+  /** Enforce TDD at engine level - block execution if tests fail (default: false) */
+  enforceTdd: z.boolean().default(false),
+  /** TDD gate configuration */
+  tddGates: z
+    .object({
+      /** Block on RED phase if no failing test exists (default: true when enforceTdd is true) */
+      requireFailingTest: z.boolean().default(true),
+      /** Block on GREEN phase if test doesn't pass (default: true when enforceTdd is true) */
+      requirePassingTest: z.boolean().default(true),
+      /** Run full test suite after REFACTOR phase (default: true when enforceTdd is true) */
+      runFullSuiteAfterRefactor: z.boolean().default(true),
+    })
+    .optional(),
 })
 export const OhMyOpenCodeConfigSchema = z.object({
   $schema: z.string().optional(),
@@ -306,7 +333,6 @@ export const OhMyOpenCodeConfigSchema = z.object({
   agents: AgentOverridesSchema.optional(),
   categories: CategoriesConfigSchema.optional(),
   claude_code: ClaudeCodeConfigSchema.optional(),
-  google_auth: z.boolean().optional(),
   sisyphus_agent: SisyphusAgentConfigSchema.optional(),
   comment_checker: CommentCheckerConfigSchema.optional(),
   experimental: ExperimentalConfigSchema.optional(),
@@ -316,6 +342,7 @@ export const OhMyOpenCodeConfigSchema = z.object({
   background_task: BackgroundTaskConfigSchema.optional(),
   notification: NotificationConfigSchema.optional(),
   git_master: GitMasterConfigSchema.optional(),
+  maestro: MaestroConfigSchema.optional(),
 })
 
 export type OhMyOpenCodeConfig = z.infer<typeof OhMyOpenCodeConfigSchema>
@@ -338,5 +365,6 @@ export type CategoryConfig = z.infer<typeof CategoryConfigSchema>
 export type CategoriesConfig = z.infer<typeof CategoriesConfigSchema>
 export type BuiltinCategoryName = z.infer<typeof BuiltinCategoryNameSchema>
 export type GitMasterConfig = z.infer<typeof GitMasterConfigSchema>
+export type MaestroConfig = z.infer<typeof MaestroConfigSchema>
 
 export { AnyMcpNameSchema, type AnyMcpName, McpNameSchema, type McpName } from "../mcp/types"

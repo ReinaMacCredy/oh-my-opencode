@@ -6,7 +6,6 @@ export interface InstallArgs {
   proxypal?: BooleanArg
   claude?: ClaudeSubscription
   chatgpt?: BooleanArg
-  gemini?: BooleanArg
   skipAuth?: boolean
 }
 
