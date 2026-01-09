@@ -278,6 +278,32 @@ Search **external references** (docs, OSS, web). Fire proactively when unfamilia
 - "Find examples of [library] usage"
 - Working with unfamiliar npm/pip/cargo packages
 
+### MCP Servers (via mcp-cli)
+
+Use \`mcp-cli\` via Bash tool for MCP server operations:
+
+\`\`\`bash
+mcp-cli                           # List all servers and tools
+mcp-cli <server> -d               # Show server tools with descriptions
+mcp-cli <server>/<tool>           # Get tool JSON schema
+mcp-cli <server>/<tool> '<json>'  # Call tool with arguments
+\`\`\`
+
+**Example:**
+\`\`\`bash
+mcp-cli context7/query-docs '{"libraryId": "/vercel/next.js", "query": "app router"}'
+\`\`\`
+
+**Available MCP servers:**
+- \`context7\`: Official library documentation lookup
+- \`websearch\`: Real-time web search (Exa AI)
+- \`grep_app\`: GitHub code search across public repos
+
+**When to use:**
+- Unfamiliar library/framework → \`context7/query-docs\` or \`context7/resolve-library-id\`
+- Need real-time web info → \`websearch/web_search_exa\`
+- Find OSS implementations → \`grep_app/searchGitHub\`
+
 ### Parallel Execution (RARELY NEEDED - DEFAULT TO DIRECT TOOLS)
 
 **⚠️ CRITICAL: Background agents are EXPENSIVE and SLOW. Use direct tools by default.**

@@ -240,6 +240,32 @@ sisyphus_task(category="visual", ...)
 
 **Recovery**: Stop, declare explicitly, then proceed.`
 
+const SISYPHUS_MCP_CLI_SECTION = `### MCP Servers (via mcp-cli)
+
+Use \`mcp-cli\` via Bash tool for MCP server operations:
+
+\`\`\`bash
+mcp-cli                           # List all servers and tools
+mcp-cli <server> -d               # Show server tools with descriptions
+mcp-cli <server>/<tool>           # Get tool JSON schema
+mcp-cli <server>/<tool> '<json>'  # Call tool with arguments
+\`\`\`
+
+**Example:**
+\`\`\`bash
+mcp-cli context7/query-docs '{"libraryId": "/vercel/next.js", "query": "app router"}'
+\`\`\`
+
+**Available MCP servers:**
+- \`context7\`: Official library documentation lookup
+- \`websearch\`: Real-time web search (Exa AI)
+- \`grep_app\`: GitHub code search across public repos
+
+**When to use:**
+- Unfamiliar library/framework → \`context7/query-docs\` or \`context7/resolve-library-id\`
+- Need real-time web info → \`websearch/web_search_exa\`
+- Find OSS implementations → \`grep_app/searchGitHub\``
+
 const SISYPHUS_PARALLEL_EXECUTION = `### Parallel Execution (DEFAULT behavior)
 
 **Explore/Librarian = Grep, not consultants.
@@ -560,6 +586,8 @@ function buildDynamicSisyphusPrompt(
     exploreSection,
     "",
     librarianSection,
+    "",
+    SISYPHUS_MCP_CLI_SECTION,
     "",
     SISYPHUS_PRE_DELEGATION_PLANNING,
     "",
