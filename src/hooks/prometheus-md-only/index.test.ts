@@ -79,6 +79,42 @@ describe("prometheus-md-only", () => {
       ).resolves.toBeUndefined()
     })
 
+    test("should allow Prometheus to write .md files inside .sisyphus/ with Windows backslash paths", async () => {
+      // #given
+      const hook = createPrometheusMdOnlyHook(createMockPluginInput())
+      const input = {
+        tool: "Write",
+        sessionID: TEST_SESSION_ID,
+        callID: "call-1",
+      }
+      const output = {
+        args: { filePath: "C:\\Users\\project\\.sisyphus\\plans\\work-plan.md" },
+      }
+
+      // #when / #then
+      await expect(
+        hook["tool.execute.before"](input, output)
+      ).resolves.toBeUndefined()
+    })
+
+    test("should block Prometheus from writing .md files outside .sisyphus/ with Windows paths", async () => {
+      // #given
+      const hook = createPrometheusMdOnlyHook(createMockPluginInput())
+      const input = {
+        tool: "Write",
+        sessionID: TEST_SESSION_ID,
+        callID: "call-1",
+      }
+      const output = {
+        args: { filePath: "C:\\Users\\project\\docs\\README.md" },
+      }
+
+      // #when / #then
+      await expect(
+        hook["tool.execute.before"](input, output)
+      ).rejects.toThrow("can only write/edit .md files inside .sisyphus/")
+    })
+
     test("should block Prometheus from writing .md files outside .sisyphus/", async () => {
       // #given
       const hook = createPrometheusMdOnlyHook(createMockPluginInput())
