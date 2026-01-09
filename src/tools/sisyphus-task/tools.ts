@@ -293,11 +293,21 @@ ${textContent || "(No text output)"}`
       }
 
       if (args.category && args.subagent_type) {
-        return `❌ Invalid arguments: Provide EITHER category OR subagent_type, not both.`
+        return `❌ Invalid arguments: Provide EITHER category OR subagent_type, not both.
+
+WRONG: sisyphus_task(category="general", subagent_type="Sisyphus-Junior-general", ...)
+RIGHT: sisyphus_task(category="general", ...)  // Uses Sisyphus-Junior with general config
+RIGHT: sisyphus_task(subagent_type="oracle", ...)  // Uses oracle agent directly`
       }
 
       if (!args.category && !args.subagent_type) {
-        return `❌ Invalid arguments: Must provide either category or subagent_type.`
+        return `❌ Invalid arguments: Must provide either category or subagent_type.
+
+Examples:
+- sisyphus_task(category="general", ...) → Uses Sisyphus-Junior with general config
+- sisyphus_task(category="visual-engineering", ...) → Uses Sisyphus-Junior with visual config
+- sisyphus_task(subagent_type="oracle", ...) → Uses oracle agent directly
+- sisyphus_task(subagent_type="explore", ...) → Uses explore agent directly`
       }
 
       let agentToUse: string

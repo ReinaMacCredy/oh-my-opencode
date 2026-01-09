@@ -58,15 +58,17 @@ function buildCategorySection(userCategories?: Record<string, CategoryConfig>): 
 
   return `##### Option A: Use CATEGORY (for domain-specific work)
 
-Categories spawn \`Sisyphus-Junior-{category}\` with optimized settings:
+Categories configure \`Sisyphus-Junior\` with optimized settings for each domain.
+**Use \`category\` parameter only - do NOT include \`subagent_type\` when using category!**
 
 | Category | Temperature | Best For |
 |----------|-------------|----------|
 ${categoryRows.join("\n")}
 
 \`\`\`typescript
-sisyphus_task(category="visual-engineering", prompt="...")      // UI/frontend work
-sisyphus_task(category="ultrabrain", prompt="...")     // Backend/strategic work
+sisyphus_task(category="visual-engineering", prompt="...")  // UI/frontend work
+sisyphus_task(category="ultrabrain", prompt="...")          // Backend/strategic work
+sisyphus_task(category="general", prompt="...")             // General tasks
 \`\`\``
 }
 
