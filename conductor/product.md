@@ -1,20 +1,32 @@
-# Product Context: oh-my-opencode
+# Product Context: @reinamaccredy/oh-my-opencode
 
 ## Vision & Purpose
 
-**oh-my-opencode (OmO)** is a "batteries-included" agent harness and enhancement suite for [OpenCode](https://github.com/sst/opencode). It is positioned as the **"oh-my-zsh for OpenCode,"** transforming a raw agentic CLI into a high-performance, multi-model development environment.
+**@reinamaccredy/oh-my-opencode** is a fork of [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode) with **integrated Maestro workflow skills**. It provides a "batteries-included" agent harness for [OpenCode](https://github.com/sst/opencode), combining the original multi-model orchestration with structured design and implementation methodology.
 
-- **Core Philosophy**: "Coding on steroids." Agents should work like a real development team, not isolated chat bots.
-- **The Sisyphus Archetype**: The project centers around **Sisyphus**, an obsessive, relentless orchestrator agent that "keeps the boulder rolling" until tasks are 100% complete.
-- **Strategic Advantage**: Aggressive parallelization, multi-model orchestration (using the best model for each specific task), and deep IDE-like tooling (LSP/AST) for agents.
+- **Core Philosophy**: "Coding on steroids" with structured workflow support
+- **The Sisyphus Archetype**: Relentless orchestrator that "keeps the boulder rolling" until tasks are 100% complete
+- **Maestro Integration**: 10-phase design pipeline, TDD methodology, parallel execution via integrated skills
 
 ## Target Users
 
-1. **Power Users & Hackers**: Developers who prefer terminal-based workflows and want total control over their agentic environment.
-2. **AI Managers**: Users who want to act as "Dev Team Leads," delegating complex tasks to a swarm of specialized subagents.
-3. **Cost-Conscious Professionals**: Users who want to leverage their existing ChatGPT Plus, Claude Pro, or Gemini subscriptions across different providers.
+1. **Power Users & Hackers**: Developers who prefer terminal-based workflows with structured methodology
+2. **AI Managers**: Users who want to delegate complex tasks with proper design → implementation flow
+3. **Teams Using Maestro**: Users familiar with the Maestro workflow who want it integrated into their agent harness
 
 ## Key Features & Capabilities
+
+### Maestro Workflow Skills (NEW)
+
+Built-in skills providing structured development methodology:
+
+| Skill | Triggers | Purpose |
+|-------|----------|---------|
+| `maestro-core` | (auto-loaded) | Skill hierarchy, routing table, fallback policies |
+| `designing` | `ds`, `cn` | 10-phase Double Diamond design pipeline |
+| `conductor` | `ci`, `ca` | TDD implementation execution |
+| `orchestrator` | `co` | Multi-agent parallel execution with Agent Mail |
+| `tracking` | `bd`, `fb`, `rb` | Beads issue tracker for persistent memory |
 
 ### Agent Swarm (The Team)
 - **Sisyphus (Orchestrator)**: The primary lead (Claude Opus 4.5). Plans and delegates.
@@ -45,10 +57,19 @@
 
 - **`ultrawork` (or `ulw`)**: The "magic word" that triggers maximum performance mode, parallel agents, and relentless execution.
 - **Bouldering**: The act of an agent working continuously through loops and failures to reach a goal.
-- **Junior Agents**: Domain-specific subagents (`Sisyphus-Junior-visual`, etc.) with optimized temperatures and prompts.
+- **Maestro Skills**: Integrated workflow skills (designing, conductor, orchestrator, tracking) providing structured methodology.
+- **Auto-prepend**: When loading any Maestro skill, `maestro-core` is automatically prepended for routing context.
 
 ## Repository
 
+- **Package**: `@reinamaccredy/oh-my-opencode` (npm)
 - **Origin**: https://github.com/ReinaMacCredy/oh-my-opencode.git (fork)
 - **Upstream**: https://github.com/code-yeongyu/oh-my-opencode.git
-- **Current Branch**: `dev`
+- **Current Branch**: `main`
+
+## Fork Maintenance
+
+See `FORK_MAINTENANCE.md` for:
+- Conflict resolution when syncing from upstream
+- How to update Maestro skills
+- Version bump and publishing workflow
