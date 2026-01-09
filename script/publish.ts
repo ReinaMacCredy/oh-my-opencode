@@ -2,7 +2,7 @@
 
 import { $ } from "bun"
 
-const PACKAGE_NAME = "oh-my-opencode"
+const PACKAGE_NAME = "@reinamaccredy/oh-my-opencode"
 const bump = process.env.BUMP as "major" | "minor" | "patch" | undefined
 const versionOverride = process.env.VERSION
 
