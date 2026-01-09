@@ -144,7 +144,7 @@ export function createConfigHandler(deps: ConfigHandlerDeps) {
       };
 
       agentConfig["Sisyphus-Junior"] = createSisyphusJuniorAgent({
-        model: "anthropic/claude-sonnet-4-5",
+        model: "proxypal/gemini-claude-sonnet-4-5-thinking",
         temperature: 0.1,
       });
 
