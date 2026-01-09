@@ -90,18 +90,22 @@ jobs:
         env:
           BUN_INSTALL_ALLOW_SCRIPTS: "@ast-grep/napi"
 
+      - name: Bump version
+        id: version
+        run: |
+          bun run script/bump-version.ts
+        env:
+          BUMP: ${{ inputs.bump }}
+          VERSION: ${{ inputs.version }}
+
       - name: Debug environment
         run: |
           echo "=== Bun version ==="
           bun --version
           echo "=== Node version ==="
           node --version
-          echo "=== Current directory ==="
-          pwd
-          echo "=== List src/ ==="
-          ls -la src/
-          echo "=== package.json scripts ==="
-          cat package.json | jq '.scripts'
+          echo "=== package.json version ==="
+          cat package.json | jq '.version'
 
       - name: Build
         run: |
@@ -120,6 +124,8 @@ jobs:
           ls -la dist/
           echo "=== dist/cli/ contents ==="
           ls -la dist/cli/
+          echo "=== Verify version in package.json ==="
+          cat package.json | jq '.version'
           test -f dist/index.js || (echo "ERROR: dist/index.js not found!" && exit 1)
           test -f dist/cli/index.js || (echo "ERROR: dist/cli/index.js not found!" && exit 1)
 
@@ -131,6 +137,7 @@ jobs:
           CI: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
+          SKIP_VERSION_BUMP: true
 
       - name: Delete draft release
         run: gh release delete next --yes 2>/dev/null || echo "No draft release to delete"
