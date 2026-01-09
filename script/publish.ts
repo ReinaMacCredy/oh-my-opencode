@@ -5,6 +5,7 @@ import { $ } from "bun"
 const PACKAGE_NAME = "@reinamaccredy/oh-my-opencode"
 const bump = process.env.BUMP as "major" | "minor" | "patch" | undefined
 const versionOverride = process.env.VERSION
+const skipVersionBump = process.env.SKIP_VERSION_BUMP === "true"
 
 console.log("=== Publishing oh-my-opencode ===\n")
 
@@ -197,17 +198,38 @@ async function checkVersionExists(version: string): Promise<boolean> {
   }
 }
 
+async function getVersionFromPackageJson(): Promise<string> {
+  const pkgPath = new URL("../package.json", import.meta.url).pathname
+  const pkg = JSON.parse(await Bun.file(pkgPath).text()) as { version: string }
+  return pkg.version
+}
+
 async function main() {
-  const previous = await fetchPreviousVersion()
-  const newVersion = versionOverride || (bump ? bumpVersion(previous, bump) : bumpVersion(previous, "patch"))
-  console.log(`New version: ${newVersion}\n`)
+  let newVersion: string
+  let previous: string
+
+  if (skipVersionBump) {
+    newVersion = await getVersionFromPackageJson()
+    previous = newVersion
+    console.log(`Using version from package.json: ${newVersion}\n`)
+  } else {
+    previous = await fetchPreviousVersion()
+    newVersion = versionOverride || (bump ? bumpVersion(previous, bump) : bumpVersion(previous, "patch"))
+    console.log(`New version: ${newVersion}\n`)
+
+    if (await checkVersionExists(newVersion)) {
+      console.log(`Version ${newVersion} already exists on npm. Skipping publish.`)
+      process.exit(0)
+    }
+
+    await updatePackageVersion(newVersion)
+  }
 
   if (await checkVersionExists(newVersion)) {
     console.log(`Version ${newVersion} already exists on npm. Skipping publish.`)
     process.exit(0)
   }
 
-  await updatePackageVersion(newVersion)
   const changelog = await generateChangelog(previous)
   const contributors = await getContributors(previous)
   const notes = [...changelog, ...contributors]
