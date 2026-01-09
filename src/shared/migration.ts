@@ -40,16 +40,11 @@ export const GOOGLE_TO_PROXYPAL_MODEL_MAP: Record<string, string> = {
   "google/gemini-3-pro-low": "proxypal/gemini-3-pro-preview",
 }
 
-// Model to category mapping for auto-migration
-// NOTE: This fork uses proxypal/ prefix instead of google/ for Gemini models.
-// When merging from upstream, replace google/gemini-* with proxypal/gemini-* equivalents.
-export const MODEL_TO_CATEGORY_MAP: Record<string, string> = {
-  "proxypal/gemini-3-pro-preview": "visual-engineering",
-  "proxypal/gpt-5.2-codex": "ultrabrain",
-  "proxypal/gemini-3-flash-preview": "quick",
-  "proxypal/gemini-claude-opus-4-5-thinking": "most-capable",
-  "proxypal/gemini-claude-sonnet-4-5-thinking": "general",
-}
+/**
+ * LEGACY model to category mapping - only for deprecated models needing migration.
+ * WARNING: Do NOT add installer-generated models (proxypal/*) - causes backup loop.
+ */
+export const MODEL_TO_CATEGORY_MAP: Record<string, string> = {}
 
 export function migrateGoogleToProxypalModel(model: string): { migrated: string; changed: boolean } {
   const proxypalModel = GOOGLE_TO_PROXYPAL_MODEL_MAP[model]

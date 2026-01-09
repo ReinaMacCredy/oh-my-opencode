@@ -252,8 +252,8 @@ describe("migration maps", () => {
 })
 
 describe("migrateAgentConfigToCategory", () => {
-  test("migrates model to category when mapping exists", () => {
-    // #given: Config with a model that has a category mapping
+  test("does not migrate proxypal models (installer-generated)", () => {
+    // #given: Config with proxypal model (set by installer, should not be migrated)
     const config = {
       model: "proxypal/gemini-3-pro-preview",
       temperature: 0.5,
@@ -263,12 +263,9 @@ describe("migrateAgentConfigToCategory", () => {
     // #when: Migrate agent config to category
     const { migrated, changed } = migrateAgentConfigToCategory(config)
 
-    // #then: Model should be replaced with category
-    expect(changed).toBe(true)
-    expect(migrated.category).toBe("visual-engineering")
-    expect(migrated.model).toBeUndefined()
-    expect(migrated.temperature).toBe(0.5)
-    expect(migrated.top_p).toBe(0.9)
+    // #then: Config should remain unchanged (proxypal models not in migration map)
+    expect(changed).toBe(false)
+    expect(migrated).toEqual(config)
   })
 
   test("does not migrate when model is not in map", () => {
@@ -301,8 +298,8 @@ describe("migrateAgentConfigToCategory", () => {
     expect(migrated).toEqual(config)
   })
 
-  test("handles all mapped models correctly", () => {
-    // #given: Configs for each mapped model (using proxypal/ prefix)
+  test("proxypal models are not migrated to categories", () => {
+    // #given: Configs with proxypal models (intentionally set by installer)
     const configs = [
       { model: "proxypal/gemini-3-pro-preview" },
       { model: "proxypal/gpt-5.2-codex" },
@@ -311,21 +308,18 @@ describe("migrateAgentConfigToCategory", () => {
       { model: "proxypal/gemini-claude-sonnet-4-5-thinking" },
     ]
 
-    const expectedCategories = ["visual-engineering", "ultrabrain", "quick", "most-capable", "general"]
-
     // #when: Migrate each config
     const results = configs.map(migrateAgentConfigToCategory)
 
-    // #then: Each model should map to correct category
+    // #then: None should be migrated (MODEL_TO_CATEGORY_MAP is empty to prevent backup loop)
     results.forEach((result, index) => {
-      expect(result.changed).toBe(true)
-      expect(result.migrated.category).toBe(expectedCategories[index])
-      expect(result.migrated.model).toBeUndefined()
+      expect(result.changed).toBe(false)
+      expect(result.migrated).toEqual(configs[index])
     })
   })
 
-  test("preserves non-model fields during migration", () => {
-    // #given: Config with multiple fields
+  test("preserves all fields when no migration needed", () => {
+    // #given: Config with multiple fields and proxypal model
     const config = {
       model: "proxypal/gpt-5.2-codex",
       temperature: 0.1,
@@ -335,14 +329,11 @@ describe("migrateAgentConfigToCategory", () => {
     }
 
     // #when: Migrate agent config to category
-    const { migrated } = migrateAgentConfigToCategory(config)
+    const { migrated, changed } = migrateAgentConfigToCategory(config)
 
-    // #then: All non-model fields should be preserved
-    expect(migrated.category).toBe("ultrabrain")
-    expect(migrated.temperature).toBe(0.1)
-    expect(migrated.top_p).toBe(0.95)
-    expect(migrated.maxTokens).toBe(4096)
-    expect(migrated.prompt_append).toBe("custom instruction")
+    // #then: All fields should be preserved unchanged
+    expect(changed).toBe(false)
+    expect(migrated).toEqual(config)
   })
 })
 
@@ -460,13 +451,13 @@ describe("migrateConfigFile with backup", () => {
     })
   })
 
-  test("creates backup file with timestamp when migration needed", () => {
-    // #given: Config file path and config needing migration
+  test("creates backup file when agent name migration needed", () => {
+    // #given: Config file with legacy agent name needing migration
     const testConfigPath = "/tmp/test-config-migration.json"
-    const testConfigContent = globalThis.JSON.stringify({ agents: { oracle: { model: "proxypal/gpt-5.2-codex" } } }, null, 2)
+    const testConfigContent = globalThis.JSON.stringify({ agents: { omo: { model: "anthropic/claude-opus-4-5" } } }, null, 2)
     const rawConfig: Record<string, unknown> = {
       agents: {
-        oracle: { model: "proxypal/gpt-5.2-codex" },
+        omo: { model: "anthropic/claude-opus-4-5" },
       },
     }
 
@@ -495,70 +486,29 @@ describe("migrateConfigFile with backup", () => {
     expect(backupContent).toBe(testConfigContent)
   })
 
-  test("deletes agent config when all fields match category defaults", () => {
-    // #given: Config with agent matching category defaults
-    const testConfigPath = "/tmp/test-config-delete.json"
+  test("does not migrate proxypal models (prevents backup loop)", () => {
+    // #given: Config with proxypal model (set by installer)
+    const testConfigPath = "/tmp/test-config-proxypal.json"
     const rawConfig: Record<string, unknown> = {
       agents: {
-        oracle: {
-          model: "proxypal/gpt-5.2-codex",
-          temperature: 0.1,
-        },
+        oracle: { model: "proxypal/gpt-5.2-codex" },
       },
     }
 
-    fs.writeFileSync(testConfigPath, globalThis.JSON.stringify({ agents: { oracle: { model: "proxypal/gpt-5.2-codex" } } }, null, 2))
+    fs.writeFileSync(testConfigPath, globalThis.JSON.stringify(rawConfig, null, 2))
     cleanupPaths.push(testConfigPath)
 
     // #when: Migrate config file
     const needsWrite = migrateConfigFile(testConfigPath, rawConfig)
 
-    // #then: Agent should be deleted (matches strategic category defaults)
-    expect(needsWrite).toBe(true)
-
-    const migratedConfig = JSON.parse(fs.readFileSync(testConfigPath, "utf-8"))
-    expect(migratedConfig.agents).toEqual({})
+    // #then: No migration should occur (prevents backup file loop)
+    expect(needsWrite).toBe(false)
 
     const dir = path.dirname(testConfigPath)
     const basename = path.basename(testConfigPath)
     const files = fs.readdirSync(dir)
     const backupFiles = files.filter((f) => f.startsWith(`${basename}.bak.`))
-    backupFiles.forEach((f) => cleanupPaths.push(path.join(dir, f)))
-  })
-
-  test("keeps agent config with category when fields differ from defaults", () => {
-    // #given: Config with agent having custom temperature override
-    const testConfigPath = "/tmp/test-config-keep.json"
-    const rawConfig: Record<string, unknown> = {
-      agents: {
-        oracle: {
-          model: "proxypal/gpt-5.2-codex",
-          temperature: 0.5,
-        },
-      },
-    }
-
-    fs.writeFileSync(testConfigPath, globalThis.JSON.stringify({ agents: { oracle: { model: "proxypal/gpt-5.2-codex" } } }, null, 2))
-    cleanupPaths.push(testConfigPath)
-
-    // #when: Migrate config file
-    const needsWrite = migrateConfigFile(testConfigPath, rawConfig)
-
-    // #then: Agent should be kept with category and custom override
-    expect(needsWrite).toBe(true)
-
-    const migratedConfig = JSON.parse(fs.readFileSync(testConfigPath, "utf-8"))
-    const agents = migratedConfig.agents as Record<string, unknown>
-    expect(agents.oracle).toBeDefined()
-    expect((agents.oracle as Record<string, unknown>).category).toBe("ultrabrain")
-    expect((agents.oracle as Record<string, unknown>).temperature).toBe(0.5)
-    expect((agents.oracle as Record<string, unknown>).model).toBeUndefined()
-
-    const dir = path.dirname(testConfigPath)
-    const basename = path.basename(testConfigPath)
-    const files = fs.readdirSync(dir)
-    const backupFiles = files.filter((f) => f.startsWith(`${basename}.bak.`))
-    backupFiles.forEach((f) => cleanupPaths.push(path.join(dir, f)))
+    expect(backupFiles.length).toBe(0)
   })
 
   test("does not write when no migration needed", () => {
@@ -586,8 +536,8 @@ describe("migrateConfigFile with backup", () => {
     expect(backupFiles.length).toBe(0)
   })
 
-  test("handles multiple agent migrations correctly", () => {
-    // #given: Config with multiple agents needing migration (proxypal models)
+  test("multiple proxypal agents do not trigger migration", () => {
+    // #given: Config with multiple proxypal models (all set by installer)
     const testConfigPath = "/tmp/test-config-multi-agent.json"
     const rawConfig: Record<string, unknown> = {
       agents: {
@@ -600,43 +550,20 @@ describe("migrateConfigFile with backup", () => {
       },
     }
 
-    fs.writeFileSync(
-      testConfigPath,
-      globalThis.JSON.stringify(
-        {
-          agents: {
-            oracle: { model: "proxypal/gpt-5.2-codex" },
-            librarian: { model: "proxypal/gemini-claude-sonnet-4-5-thinking" },
-            frontend: { model: "proxypal/gemini-3-pro-preview" },
-          },
-        },
-        null,
-        2,
-      ),
-    )
+    fs.writeFileSync(testConfigPath, globalThis.JSON.stringify(rawConfig, null, 2))
     cleanupPaths.push(testConfigPath)
 
     // #when: Migrate config file
     const needsWrite = migrateConfigFile(testConfigPath, rawConfig)
 
-    // #then: Should migrate correctly
-    expect(needsWrite).toBe(true)
-
-    const migratedConfig = JSON.parse(fs.readFileSync(testConfigPath, "utf-8"))
-    const agents = migratedConfig.agents as Record<string, unknown>
-
-    expect(agents.oracle).toBeUndefined()
-    expect(agents.librarian).toBeUndefined()
-
-    expect(agents.frontend).toBeDefined()
-    expect((agents.frontend as Record<string, unknown>).category).toBe("visual-engineering")
-    expect((agents.frontend as Record<string, unknown>).temperature).toBe(0.9)
+    // #then: No migration should occur
+    expect(needsWrite).toBe(false)
 
     const dir = path.dirname(testConfigPath)
     const basename = path.basename(testConfigPath)
     const files = fs.readdirSync(dir)
     const backupFiles = files.filter((f) => f.startsWith(`${basename}.bak.`))
-    backupFiles.forEach((f) => cleanupPaths.push(path.join(dir, f)))
+    expect(backupFiles.length).toBe(0)
   })
 })
 

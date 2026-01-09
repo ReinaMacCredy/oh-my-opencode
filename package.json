@@ -68,6 +68,7 @@
     "@openauthjs/openauth": "^0.4.3",
     "@opencode-ai/plugin": "^1.1.1",
     "@opencode-ai/sdk": "^1.1.1",
+    "@reinamaccredy/oh-my-opencode": "^3.0.0-beta.13",
     "commander": "^14.0.2",
     "hono": "^4.10.4",
     "js-yaml": "^4.1.1",
