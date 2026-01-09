@@ -224,7 +224,7 @@ export class MaestroAdapter implements WorkflowEngineContract_v1 {
     if (request.mode === "parallel" && trackIds.length >= 2) {
       return {
         success: true,
-        warnings: [`Parallel execution initiated for ${trackIds.length} tracks. Use orchestrator skill to spawn workers.`],
+        warnings: [`Parallel execution initiated for ${trackIds.length} tracks. Use co mode with agent-mail skill.`],
       }
     }
 
