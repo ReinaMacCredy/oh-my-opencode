@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs"
 import { join } from "node:path"
-import { expandEnvVarsInObject } from "../claude-code-mcp-loader/env-expander"
+import { expandEnvVarsInObject } from "../../shared/env-expander"
 import type {
   McpCliConfig,
   McpCliLoadResult,
