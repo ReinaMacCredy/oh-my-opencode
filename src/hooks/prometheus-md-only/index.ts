@@ -8,8 +8,10 @@ import { log } from "../../shared/logger"
 export * from "./constants"
 
 function isAllowedFile(filePath: string): boolean {
-  const hasAllowedExtension = ALLOWED_EXTENSIONS.some(ext => filePath.endsWith(ext))
-  const isInAllowedPath = filePath.includes(ALLOWED_PATH_PREFIX)
+  // Normalize Windows backslashes to forward slashes for cross-platform compatibility
+  const normalizedPath = filePath.replace(/\\/g, "/")
+  const hasAllowedExtension = ALLOWED_EXTENSIONS.some(ext => normalizedPath.endsWith(ext))
+  const isInAllowedPath = normalizedPath.includes(ALLOWED_PATH_PREFIX)
   return hasAllowedExtension && isInAllowedPath
 }
 
