@@ -70,13 +70,14 @@ import { log, detectExternalNotificationPlugin, getNotificationConflictWarning }
 import { loadPluginConfig } from "./plugin-config";
 import { createModelCacheState, getModelLimit } from "./plugin-state";
 import { createConfigHandler } from "./plugin-handlers";
-import { initFork } from "./fork";
+import { initFork, initMaestroHooks } from "./fork";
 
 const OhMyOpenCodePlugin: Plugin = async (ctx) => {
   startTmuxCheck();
 
   let pluginConfig = loadPluginConfig(ctx.directory, ctx);
   pluginConfig = initFork(pluginConfig);
+  const maestroHooks = initMaestroHooks(ctx, pluginConfig);
   const disabledHooks = new Set(pluginConfig.disabled_hooks ?? []);
   const isHookEnabled = (hookName: HookName) => !disabledHooks.has(hookName);
 
@@ -202,15 +203,6 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
   const sisyphusOrchestrator = isHookEnabled("sisyphus-orchestrator")
     ? createSisyphusOrchestratorHook(ctx)
     : null;
-
-  // Maestro hooks disabled - removed from schema
-  // const tddEnforcement = isHookEnabled("tdd-enforcement")
-  //   ? createTddEnforcementHook(ctx, pluginConfig.maestro)
-  //   : null;
-
-  // const maestroSisyphusBridge = isHookEnabled("maestro-sisyphus-bridge")
-  //   ? createMaestroSisyphusBridgeHook(ctx, pluginConfig.maestro)
-  //   : null;
 
   const prometheusMdOnly = isHookEnabled("prometheus-md-only")
     ? createPrometheusMdOnlyHook(ctx)
@@ -442,6 +434,7 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
 
     "tool.execute.before": async (input, output) => {
       await claudeCodeHooks["tool.execute.before"](input, output);
+      await (maestroHooks as any)?.["tool.execute.before"]?.(input, output);
       await nonInteractiveEnv?.["tool.execute.before"](input, output);
       await commentChecker?.["tool.execute.before"](input, output);
       await directoryAgentsInjector?.["tool.execute.before"]?.(input, output);
@@ -496,6 +489,7 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
 
     "tool.execute.after": async (input, output) => {
       await claudeCodeHooks["tool.execute.after"](input, output);
+      await (maestroHooks as any)?.["tool.execute.after"]?.(input, output);
       await toolOutputTruncator?.["tool.execute.after"](input, output);
       await contextWindowMonitor?.["tool.execute.after"](input, output);
       await commentChecker?.["tool.execute.after"](input, output);

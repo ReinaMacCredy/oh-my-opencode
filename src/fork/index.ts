@@ -1,6 +1,8 @@
 import type { OhMyOpenCodeConfig } from "../config";
 import type { ForkConfig } from "./schema-extensions";
 import { PROXYPAL_AGENT_MODELS, PROXYPAL_CATEGORY_MODELS } from "./proxypal/models";
+import { createMaestroPlugin } from "../plugins/maestro";
+import type { PluginInput } from "@opencode-ai/plugin";
 
 export * from "./proxypal/models";
 export * from "./proxypal/apply";
@@ -43,4 +45,8 @@ export function initFork(config: ConfigWithFork): ConfigWithFork {
 	});
 	
 	return config;
+}
+
+export function initMaestroHooks(ctx: PluginInput, config: any) {
+	return createMaestroPlugin(ctx, config?.maestro);
 }
