@@ -70,12 +70,13 @@ import { log, detectExternalNotificationPlugin, getNotificationConflictWarning }
 import { loadPluginConfig } from "./plugin-config";
 import { createModelCacheState, getModelLimit } from "./plugin-state";
 import { createConfigHandler } from "./plugin-handlers";
+import { initFork } from "./fork";
 
 const OhMyOpenCodePlugin: Plugin = async (ctx) => {
-  // Start background tmux check immediately
   startTmuxCheck();
 
-  const pluginConfig = loadPluginConfig(ctx.directory, ctx);
+  let pluginConfig = loadPluginConfig(ctx.directory, ctx);
+  pluginConfig = initFork(pluginConfig);
   const disabledHooks = new Set(pluginConfig.disabled_hooks ?? []);
   const isHookEnabled = (hookName: HookName) => !disabledHooks.has(hookName);
 
