@@ -1,0 +1,31 @@
+{
+  "name": "@reinamaccredy/maestro-plugin",
+  "version": "1.0.0",
+  "description": "Maestro workflow plugin for oh-my-opencode - Context-driven development with TDD execution, design phases, and boulder state management",
+  "main": "index.ts",
+  "type": "module",
+  "keywords": [
+    "opencode",
+    "plugin",
+    "maestro",
+    "workflow",
+    "tdd",
+    "design-phases",
+    "boulder-state",
+    "context-driven"
+  ],
+  "author": "ReinaMacCredy",
+  "license": "SUL-1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ReinaMacCredy/oh-my-opencode.git",
+    "directory": "src/plugins/maestro"
+  },
+  "bugs": {
+    "url": "https://github.com/ReinaMacCredy/oh-my-opencode/issues"
+  },
+  "homepage": "https://github.com/ReinaMacCredy/oh-my-opencode/tree/main/src/plugins/maestro#readme",
+  "peerDependencies": {
+    "@opencode-ai/plugin": ">=0.0.154"
+  }
+}
