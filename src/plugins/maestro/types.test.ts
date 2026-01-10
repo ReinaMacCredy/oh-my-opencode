@@ -42,7 +42,7 @@ describe("MaestroEvent union type", () => {
 	it("should accept task:started event", () => {
 		const event: MaestroEvent = {
 			type: "task:started",
-			payload: { taskId: "task-1", title: "Test Task" },
+			payload: { taskId: "task-1", title: "Test Task", sessionId: "ses_123", timestamp: Date.now() },
 		};
 
 		expect(event.type).toBe("task:started");
@@ -51,7 +51,7 @@ describe("MaestroEvent union type", () => {
 	it("should accept task:completed event", () => {
 		const event: MaestroEvent = {
 			type: "task:completed",
-			payload: { taskId: "task-1", title: "Test Task" },
+			payload: { taskId: "task-1", title: "Test Task", sessionId: "ses_123", timestamp: Date.now() },
 		};
 
 		expect(event.type).toBe("task:completed");
@@ -70,7 +70,7 @@ describe("MaestroEvent union type", () => {
 	it("should accept design:phase-changed event", () => {
 		const event: MaestroEvent = {
 			type: "design:phase-changed",
-			payload: { from: 1, to: 2 },
+			payload: { fromPhase: 1, phase: 2, sessionID: "ses_123", timestamp: Date.now() },
 		};
 
 		expect(event.type).toBe("design:phase-changed");
@@ -79,7 +79,7 @@ describe("MaestroEvent union type", () => {
 	it("should accept workflow:started event", () => {
 		const event: MaestroEvent = {
 			type: "workflow:started",
-			payload: { planPath: "/path/to/plan.md", sessionId: "ses_123" },
+			payload: { sessionID: "ses_123", timestamp: Date.now(), totalTasks: 5, completedTasks: 0 },
 		};
 
 		expect(event.type).toBe("workflow:started");
@@ -88,7 +88,7 @@ describe("MaestroEvent union type", () => {
 	it("should accept workflow:completed event", () => {
 		const event: MaestroEvent = {
 			type: "workflow:completed",
-			payload: { planPath: "/path/to/plan.md" },
+			payload: { sessionID: "ses_123", timestamp: Date.now(), totalTasks: 5, completedTasks: 5 },
 		};
 
 		expect(event.type).toBe("workflow:completed");
