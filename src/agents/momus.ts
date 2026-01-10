@@ -2,22 +2,9 @@ import type { AgentConfig } from "@opencode-ai/sdk"
 import type { AgentPromptMetadata } from "./types"
 import { isGptModel, getGptReasoningEffort } from "./types"
 import { createAgentToolRestrictions } from "../shared/permission-compat"
+import { PROXYPAL_AGENT_MODELS } from "../fork/proxypal/models"
 
-/**
- * Momus - Plan Reviewer Agent
- *
- * Named after Momus, the Greek god of satire and mockery, who was known for
- * finding fault in everything - even the works of the gods themselves.
- * He criticized Aphrodite (found her sandals squeaky), Hephaestus (said man
- * should have windows in his chest to see thoughts), and Athena (her house
- * should be on wheels to move from bad neighbors).
- *
- * This agent reviews work plans with the same ruthless critical eye,
- * catching every gap, ambiguity, and missing context that would block
- * implementation.
- */
-
-const DEFAULT_MODEL = "proxypal/gpt-5.2-codex"
+const DEFAULT_MODEL = PROXYPAL_AGENT_MODELS["Momus (Plan Reviewer)"]
 
 export const MOMUS_SYSTEM_PROMPT = `You are a work plan review expert. You review the provided work plan (.sisyphus/plans/{name}.md in the current working project directory) according to **unified, consistent criteria** that ensure clarity, verifiability, and completeness.
 

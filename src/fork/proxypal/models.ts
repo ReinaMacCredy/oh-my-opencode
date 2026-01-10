@@ -15,6 +15,7 @@ export const PROXYPAL_PROVIDER = "proxypal" as const;
 export const PROXYPAL_AGENT_MODELS = {
 	oracle: "proxypal/gpt-5.2-codex",
 	"Momus (Plan Reviewer)": "proxypal/gpt-5.2-codex",
+	"Metis (Plan Consultant)": "proxypal/gemini-claude-opus-4-5-thinking",
 	librarian: "proxypal/gemini-claude-opus-4-5-thinking",
 	explore: "proxypal/gemini-3-flash-preview",
 	"frontend-ui-ux-engineer": "proxypal/gemini-3-pro-preview",

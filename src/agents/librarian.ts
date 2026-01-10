@@ -1,7 +1,8 @@
 import type { AgentConfig } from "@opencode-ai/sdk"
 import type { AgentPromptMetadata } from "./types"
+import { PROXYPAL_AGENT_MODELS } from "../fork/proxypal/models"
 
-const DEFAULT_MODEL = "proxypal/gemini-claude-opus-4-5-thinking"
+const DEFAULT_MODEL = PROXYPAL_AGENT_MODELS.librarian
 
 export const LIBRARIAN_PROMPT_METADATA: AgentPromptMetadata = {
   category: "exploration",

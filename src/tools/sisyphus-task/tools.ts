@@ -10,6 +10,7 @@ import { resolveMultipleSkills } from "../../features/opencode-skill-loader/skil
 import { createBuiltinSkills } from "../../features/builtin-skills/skills"
 import { getTaskToastManager } from "../../features/task-toast-manager"
 import { subagentSessions } from "../../features/claude-code-session-state"
+import { PROXYPAL_AGENT_MODELS } from "../../fork/proxypal/models"
 
 type OpencodeClient = PluginInput["client"]
 
@@ -72,7 +73,7 @@ function resolveCategoryConfig(
   const config: CategoryConfig = {
     ...defaultConfig,
     ...userConfig,
-    model: userConfig?.model ?? defaultConfig?.model ?? "proxypal/gemini-claude-sonnet-4-5-thinking",
+    model: userConfig?.model ?? defaultConfig?.model ?? PROXYPAL_AGENT_MODELS["Sisyphus-Junior"],
   }
 
   let promptAppend = defaultPromptAppend

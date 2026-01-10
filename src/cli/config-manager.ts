@@ -1,12 +1,13 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync, statSync } from "node:fs"
 import { join } from "node:path"
 import {
-  parseJsonc,
-  getOpenCodeConfigPaths,
-  type OpenCodeBinaryType,
-  type OpenCodeConfigPaths,
+	parseJsonc,
+	getOpenCodeConfigPaths,
+	type OpenCodeBinaryType,
+	type OpenCodeConfigPaths,
 } from "../shared"
 import type { ConfigMergeResult, DetectedConfig, InstallConfig } from "./types"
+import { PROXYPAL_AGENT_MODELS, PROXYPAL_CATEGORY_MODELS } from "../fork/proxypal/models"
 
 const OPENCODE_BINARIES = ["opencode", "opencode-desktop"] as const
 
@@ -272,28 +273,28 @@ export function generateOmoConfig(installConfig: InstallConfig): Record<string, 
 
   const agents: Record<string, Record<string, unknown>> = {}
 
-  if (installConfig.hasProxyPal) {
-    agents["Sisyphus"] = { model: "proxypal/gemini-claude-opus-4-5-thinking" }
-    agents["librarian"] = { model: "proxypal/gemini-claude-opus-4-5-thinking" }
-    agents["explore"] = { model: "proxypal/gemini-3-flash-preview" }
-    agents["frontend-ui-ux-engineer"] = { model: "proxypal/gemini-3-pro-preview" }
-    agents["document-writer"] = { model: "proxypal/gemini-3-flash-preview" }
-    agents["multimodal-looker"] = { model: "proxypal/gemini-3-flash-preview" }
-    agents["orchestrator-sisyphus"] = { model: "proxypal/gemini-claude-sonnet-4-5-thinking" }
-    agents["Prometheus (Planner)"] = { model: "proxypal/gemini-claude-opus-4-5-thinking" }
-    agents["Metis (Plan Consultant)"] = { model: "proxypal/gemini-claude-opus-4-5-thinking" }
-    agents["oracle"] = { model: "proxypal/gpt-5.2-codex" }
-    agents["Momus (Plan Reviewer)"] = { model: "proxypal/gpt-5.2-codex" }
-  } else if (installConfig.hasGemini) {
-    agents["Sisyphus"] = { model: "proxypal/gemini-claude-opus-4-5-thinking" }
-    agents["librarian"] = { model: "proxypal/gemini-claude-opus-4-5-thinking" }
-    agents["explore"] = { model: "proxypal/gemini-3-flash-preview" }
-    agents["frontend-ui-ux-engineer"] = { model: "proxypal/gemini-3-pro-preview" }
-    agents["document-writer"] = { model: "proxypal/gemini-3-flash-preview" }
-    agents["multimodal-looker"] = { model: "proxypal/gemini-3-flash-preview" }
-    agents["orchestrator-sisyphus"] = { model: "proxypal/gemini-claude-sonnet-4-5-thinking" }
-    agents["Prometheus (Planner)"] = { model: "proxypal/gemini-claude-opus-4-5-thinking" }
-    agents["Metis (Plan Consultant)"] = { model: "proxypal/gemini-claude-opus-4-5-thinking" }
+	if (installConfig.hasProxyPal) {
+		agents["Sisyphus"] = { model: PROXYPAL_AGENT_MODELS.Sisyphus }
+		agents["librarian"] = { model: PROXYPAL_AGENT_MODELS.librarian }
+		agents["explore"] = { model: PROXYPAL_AGENT_MODELS.explore }
+		agents["frontend-ui-ux-engineer"] = { model: PROXYPAL_AGENT_MODELS["frontend-ui-ux-engineer"] }
+		agents["document-writer"] = { model: PROXYPAL_AGENT_MODELS["document-writer"] }
+		agents["multimodal-looker"] = { model: PROXYPAL_AGENT_MODELS["multimodal-looker"] }
+		agents["orchestrator-sisyphus"] = { model: PROXYPAL_AGENT_MODELS["orchestrator-sisyphus"] }
+		agents["Prometheus (Planner)"] = { model: PROXYPAL_AGENT_MODELS.Sisyphus }
+		agents["Metis (Plan Consultant)"] = { model: PROXYPAL_AGENT_MODELS.Sisyphus }
+		agents["oracle"] = { model: PROXYPAL_AGENT_MODELS.oracle }
+		agents["Momus (Plan Reviewer)"] = { model: PROXYPAL_AGENT_MODELS["Momus (Plan Reviewer)"] }
+	} else if (installConfig.hasGemini) {
+		agents["Sisyphus"] = { model: PROXYPAL_AGENT_MODELS.Sisyphus }
+		agents["librarian"] = { model: PROXYPAL_AGENT_MODELS.librarian }
+		agents["explore"] = { model: PROXYPAL_AGENT_MODELS.explore }
+		agents["frontend-ui-ux-engineer"] = { model: PROXYPAL_AGENT_MODELS["frontend-ui-ux-engineer"] }
+		agents["document-writer"] = { model: PROXYPAL_AGENT_MODELS["document-writer"] }
+		agents["multimodal-looker"] = { model: PROXYPAL_AGENT_MODELS["multimodal-looker"] }
+		agents["orchestrator-sisyphus"] = { model: PROXYPAL_AGENT_MODELS["orchestrator-sisyphus"] }
+		agents["Prometheus (Planner)"] = { model: PROXYPAL_AGENT_MODELS.Sisyphus }
+		agents["Metis (Plan Consultant)"] = { model: PROXYPAL_AGENT_MODELS.Sisyphus }
   } else if (installConfig.hasClaude) {
     agents["Sisyphus"] = { model: "anthropic/claude-opus-4-5" }
     agents["librarian"] = { model: "anthropic/claude-sonnet-4-5" }
@@ -310,11 +311,10 @@ export function generateOmoConfig(installConfig: InstallConfig): Record<string, 
     agents["multimodal-looker"] = { model: "opencode/glm-4.7-free" }
   }
 
-  // Oracle and Momus are already set if hasProxyPal is true, skip this block
-  if (!installConfig.hasProxyPal) {
-    if (installConfig.hasChatGPT) {
-      agents["oracle"] = { model: "proxypal/gpt-5.2-codex" }
-      agents["Momus (Plan Reviewer)"] = { model: "proxypal/gpt-5.2-codex" }
+	if (!installConfig.hasProxyPal) {
+		if (installConfig.hasChatGPT) {
+			agents["oracle"] = { model: PROXYPAL_AGENT_MODELS.oracle }
+			agents["Momus (Plan Reviewer)"] = { model: PROXYPAL_AGENT_MODELS["Momus (Plan Reviewer)"] }
     } else if (installConfig.hasClaude) {
       agents["oracle"] = { model: "anthropic/claude-opus-4-5" }
       agents["Momus (Plan Reviewer)"] = { model: "anthropic/claude-opus-4-5" }
@@ -327,31 +327,31 @@ export function generateOmoConfig(installConfig: InstallConfig): Record<string, 
     config.agents = agents
   }
 
-  if (installConfig.hasProxyPal) {
-    config.categories = {
-      "visual-engineering": { model: "proxypal/gemini-3-pro-preview" },
-      ultrabrain: { model: "proxypal/gpt-5.2-codex" },
-      artistry: { model: "proxypal/gemini-3-pro-preview" },
-      quick: { model: "proxypal/gemini-3-flash-preview" },
-      "most-capable": { model: "proxypal/gemini-claude-opus-4-5-thinking" },
-      writing: { model: "proxypal/gemini-3-flash-preview" },
-      general: { model: "proxypal/gemini-claude-opus-4-5-thinking" },
-    }
+	if (installConfig.hasProxyPal) {
+		config.categories = {
+			"visual-engineering": { model: PROXYPAL_CATEGORY_MODELS["visual-engineering"] },
+			ultrabrain: { model: PROXYPAL_CATEGORY_MODELS.ultrabrain },
+			artistry: { model: PROXYPAL_CATEGORY_MODELS.artistry },
+			quick: { model: PROXYPAL_CATEGORY_MODELS.quick },
+			"most-capable": { model: PROXYPAL_CATEGORY_MODELS["most-capable"] },
+			writing: { model: PROXYPAL_CATEGORY_MODELS.writing },
+			general: { model: PROXYPAL_CATEGORY_MODELS.general },
+		}
   } else if (installConfig.hasGemini) {
     config.categories = {
-      "visual-engineering": { model: "proxypal/gemini-3-pro-preview" },
-      ultrabrain: { model: "proxypal/gpt-5.2-codex" },
-      artistry: { model: "proxypal/gemini-3-pro-preview" },
-      quick: { model: "proxypal/gemini-3-flash-preview" },
-      "most-capable": { model: "proxypal/gemini-claude-opus-4-5-thinking" },
-      writing: { model: "proxypal/gemini-3-flash-preview" },
-      general: { model: "proxypal/gemini-claude-opus-4-5-thinking" },
+      "visual-engineering": { model: PROXYPAL_CATEGORY_MODELS["visual-engineering"] },
+      ultrabrain: { model: PROXYPAL_CATEGORY_MODELS.ultrabrain },
+      artistry: { model: PROXYPAL_CATEGORY_MODELS.artistry },
+      quick: { model: PROXYPAL_CATEGORY_MODELS.quick },
+      "most-capable": { model: PROXYPAL_CATEGORY_MODELS["most-capable"] },
+      writing: { model: PROXYPAL_CATEGORY_MODELS.writing },
+      general: { model: PROXYPAL_CATEGORY_MODELS.general },
     }
-  } else if (installConfig.hasChatGPT) {
-    config.categories = {
-      ultrabrain: { model: "proxypal/gpt-5.2-codex" },
-    }
-  }
+	} else if (installConfig.hasChatGPT) {
+		config.categories = {
+			ultrabrain: { model: PROXYPAL_CATEGORY_MODELS.ultrabrain },
+		}
+	}
 
   return config
 }
@@ -811,7 +811,7 @@ export function detectCurrentConfig(): DetectedConfig {
 
     const agents = omoConfig.agents ?? {}
 
-    if (agents["Sisyphus"]?.model?.startsWith("proxypal/")) {
+    if (agents["Sisyphus"]?.model?.includes("proxypal/") || agents["Sisyphus"]?.model?.includes("openai/")) {
       result.hasProxyPal = true
       result.hasClaude = false
       result.isMax20 = false

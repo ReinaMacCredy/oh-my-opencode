@@ -18,6 +18,7 @@ import {
   loadProjectAgents,
 } from "../features/claude-code-agent-loader";
 import { loadAllPluginComponents } from "../features/claude-code-plugin-loader";
+import { PROXYPAL_AGENT_MODELS } from "../fork/proxypal/models";
 import type { OhMyOpenCodeConfig } from "../config";
 import { log } from "../shared";
 import { migrateAgentConfig } from "../shared/permission-compat";
@@ -142,7 +143,7 @@ export function createConfigHandler(deps: ConfigHandlerDeps) {
       };
 
       agentConfig["Sisyphus-Junior"] = createSisyphusJuniorAgent({
-        model: "proxypal/gemini-claude-sonnet-4-5-thinking",
+        model: PROXYPAL_AGENT_MODELS["Sisyphus-Junior"],
         temperature: 0.1,
       });
 
@@ -174,7 +175,7 @@ export function createConfigHandler(deps: ConfigHandlerDeps) {
           pluginConfig.agents?.["Prometheus (Planner)"];
         const defaultModel = config.model as string | undefined;
         const prometheusBase = {
-          model: defaultModel ?? "proxypal/gemini-claude-opus-4-5-thinking",
+          model: defaultModel ?? PROXYPAL_AGENT_MODELS.Sisyphus,
           mode: "primary" as const,
           prompt: PROMETHEUS_SYSTEM_PROMPT,
           permission: PROMETHEUS_PERMISSION,

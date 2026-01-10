@@ -2,8 +2,9 @@ import type { AgentConfig } from "@opencode-ai/sdk"
 import type { AgentPromptMetadata } from "./types"
 import { isGptModel, getGptReasoningEffort } from "./types"
 import { createAgentToolRestrictions } from "../shared/permission-compat"
+import { PROXYPAL_AGENT_MODELS } from "../fork/proxypal/models"
 
-const DEFAULT_MODEL = "proxypal/gpt-5.2-codex"
+const DEFAULT_MODEL = PROXYPAL_AGENT_MODELS.oracle
 
 export const ORACLE_PROMPT_METADATA: AgentPromptMetadata = {
   category: "advisor",

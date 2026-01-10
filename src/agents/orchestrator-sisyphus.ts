@@ -4,6 +4,7 @@ import type { AvailableAgent, AvailableSkill } from "./sisyphus-prompt-builder"
 import type { CategoryConfig } from "../config/schema"
 import { DEFAULT_CATEGORIES, CATEGORY_DESCRIPTIONS } from "../tools/sisyphus-task/constants"
 import { createAgentToolRestrictions } from "../shared/permission-compat"
+import { PROXYPAL_AGENT_MODELS } from "../fork/proxypal/models"
 
 /**
  * Orchestrator Sisyphus - Master Orchestrator Agent
@@ -1469,7 +1470,7 @@ function buildDynamicOrchestratorPrompt(ctx?: OrchestratorContext): string {
     .replace("{SKILLS_SECTION}", skillsSection)
 }
 
-const DEFAULT_MODEL = "proxypal/gemini-claude-sonnet-4-5-thinking"
+const DEFAULT_MODEL = PROXYPAL_AGENT_MODELS["orchestrator-sisyphus"]
 
 export function createOrchestratorSisyphusAgent(ctx?: OrchestratorContext): AgentConfig {
   const restrictions = createAgentToolRestrictions([

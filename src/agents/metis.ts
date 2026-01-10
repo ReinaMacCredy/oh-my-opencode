@@ -278,7 +278,9 @@ const metisRestrictions = createAgentToolRestrictions([
   "sisyphus_task",
 ])
 
-const DEFAULT_MODEL = "proxypal/gemini-claude-opus-4-5-thinking"
+import { PROXYPAL_AGENT_MODELS } from "../fork/proxypal/models"
+
+const DEFAULT_MODEL = PROXYPAL_AGENT_MODELS["Metis (Plan Consultant)"]
 
 export function createMetisAgent(model: string = DEFAULT_MODEL): AgentConfig {
   return {

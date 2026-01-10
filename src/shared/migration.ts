@@ -1,44 +1,32 @@
 import * as fs from "fs"
 import { log } from "./logger"
+import { GOOGLE_TO_PROXYPAL_MODEL_MAP as _GOOGLE_TO_PROXYPAL_MODEL_MAP } from "../fork/proxypal/models"
 
-// Migration map: old keys → new keys (for backward compatibility)
 export const AGENT_NAME_MAP: Record<string, string> = {
-  omo: "Sisyphus",
-  "OmO": "Sisyphus",
-  sisyphus: "Sisyphus",
-  "OmO-Plan": "Prometheus (Planner)",
-  "omo-plan": "Prometheus (Planner)",
-  "Planner-Sisyphus": "Prometheus (Planner)",
-  "planner-sisyphus": "Prometheus (Planner)",
-  prometheus: "Prometheus (Planner)",
-  "plan-consultant": "Metis (Plan Consultant)",
-  metis: "Metis (Plan Consultant)",
-  build: "build",
-  oracle: "oracle",
-  librarian: "librarian",
-  explore: "explore",
-  "frontend-ui-ux-engineer": "frontend-ui-ux-engineer",
-  "document-writer": "document-writer",
-  "multimodal-looker": "multimodal-looker",
+	omo: "Sisyphus",
+	"OmO": "Sisyphus",
+	sisyphus: "Sisyphus",
+	"OmO-Plan": "Prometheus (Planner)",
+	"omo-plan": "Prometheus (Planner)",
+	"Planner-Sisyphus": "Prometheus (Planner)",
+	"planner-sisyphus": "Prometheus (Planner)",
+	prometheus: "Prometheus (Planner)",
+	"plan-consultant": "Metis (Plan Consultant)",
+	metis: "Metis (Plan Consultant)",
+	build: "build",
+	oracle: "oracle",
+	librarian: "librarian",
+	explore: "explore",
+	"frontend-ui-ux-engineer": "frontend-ui-ux-engineer",
+	"document-writer": "document-writer",
+	"multimodal-looker": "multimodal-looker",
 }
 
-// Migration map: old hook names → new hook names (for backward compatibility)
 export const HOOK_NAME_MAP: Record<string, string> = {
-  // Legacy names (backward compatibility)
-  "anthropic-auto-compact": "anthropic-context-window-limit-recovery",
+	"anthropic-auto-compact": "anthropic-context-window-limit-recovery",
 }
 
-// Migration map: google/ → proxypal/ model names
-// Users who installed with older versions may have google/gemini-* models
-// that need to be migrated to proxypal/gemini-* equivalents.
-export const GOOGLE_TO_PROXYPAL_MODEL_MAP: Record<string, string> = {
-  "google/gemini-3-pro-preview": "proxypal/gemini-3-pro-preview",
-  "google/gemini-3-flash-preview": "proxypal/gemini-3-flash-preview",
-  "google/gemini-3-flash": "proxypal/gemini-3-flash-preview",
-  "google/gemini-3-pro": "proxypal/gemini-3-pro-preview",
-  "google/gemini-3-pro-high": "proxypal/gemini-3-pro-preview",
-  "google/gemini-3-pro-low": "proxypal/gemini-3-pro-preview",
-}
+export const GOOGLE_TO_PROXYPAL_MODEL_MAP = _GOOGLE_TO_PROXYPAL_MODEL_MAP
 
 /**
  * LEGACY model to category mapping - only for deprecated models needing migration.

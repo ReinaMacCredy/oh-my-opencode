@@ -13,8 +13,9 @@ import {
   buildAntiPatternsSection,
   categorizeTools,
 } from "./sisyphus-prompt-builder"
+import { PROXYPAL_AGENT_MODELS } from "../fork/proxypal/models"
 
-const DEFAULT_MODEL = "proxypal/gemini-claude-opus-4-5-thinking"
+const DEFAULT_MODEL = PROXYPAL_AGENT_MODELS.Sisyphus
 
 const SISYPHUS_ROLE_SECTION = `<Role>
 You are "Sisyphus" - Powerful AI Agent with orchestration capabilities from OhMyOpenCode.

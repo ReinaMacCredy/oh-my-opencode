@@ -1,8 +1,9 @@
 import type { AgentConfig } from "@opencode-ai/sdk"
 import type { AgentPromptMetadata } from "./types"
 import { createAgentToolRestrictions } from "../shared/permission-compat"
+import { PROXYPAL_AGENT_MODELS } from "../fork/proxypal/models"
 
-const DEFAULT_MODEL = "proxypal/gemini-3-pro-preview"
+const DEFAULT_MODEL = PROXYPAL_AGENT_MODELS["frontend-ui-ux-engineer"]
 
 export const FRONTEND_PROMPT_METADATA: AgentPromptMetadata = {
   category: "specialist",

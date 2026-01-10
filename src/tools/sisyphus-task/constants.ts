@@ -1,4 +1,5 @@
 import type { CategoryConfig } from "../../config/schema"
+import { PROXYPAL_CATEGORY_MODELS } from "../../fork/proxypal/models"
 
 export const VISUAL_CATEGORY_PROMPT_APPEND = `<Category_Context>
 You are working on VISUAL/UI tasks.
@@ -184,34 +185,34 @@ The more explicit your prompt, the better the results.
 </Caller_Warning>`
 
 export const DEFAULT_CATEGORIES: Record<string, CategoryConfig> = {
-  "visual-engineering": {
-    model: "proxypal/gemini-3-pro-preview",
-    temperature: 0.7,
-  },
-  ultrabrain: {
-    model: "proxypal/gpt-5.2-codex",
-    temperature: 0.1,
-  },
-  artistry: {
-    model: "proxypal/gemini-3-pro-preview",
-    temperature: 0.9,
-  },
-  quick: {
-    model: "proxypal/gemini-3-flash-preview",
-    temperature: 0.3,
-  },
-  "most-capable": {
-    model: "proxypal/gemini-claude-opus-4-5-thinking",
-    temperature: 0.1,
-  },
-  writing: {
-    model: "proxypal/gemini-3-flash-preview",
-    temperature: 0.5,
-  },
-  general: {
-    model: "proxypal/gemini-claude-sonnet-4-5-thinking",
-    temperature: 0.3,
-  },
+	"visual-engineering": {
+		model: PROXYPAL_CATEGORY_MODELS["visual-engineering"],
+		temperature: 0.7,
+	},
+	ultrabrain: {
+		model: PROXYPAL_CATEGORY_MODELS.ultrabrain,
+		temperature: 0.1,
+	},
+	artistry: {
+		model: PROXYPAL_CATEGORY_MODELS.artistry,
+		temperature: 0.9,
+	},
+	quick: {
+		model: PROXYPAL_CATEGORY_MODELS.quick,
+		temperature: 0.3,
+	},
+	"most-capable": {
+		model: PROXYPAL_CATEGORY_MODELS["most-capable"],
+		temperature: 0.1,
+	},
+	writing: {
+		model: PROXYPAL_CATEGORY_MODELS.writing,
+		temperature: 0.5,
+	},
+	general: {
+		model: PROXYPAL_CATEGORY_MODELS.general,
+		temperature: 0.3,
+	},
 }
 
 export const CATEGORY_PROMPT_APPENDS: Record<string, string> = {
