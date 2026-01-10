@@ -4,6 +4,7 @@ import { createMaestroSisyphusBridgeHook } from "./hooks/sisyphus-bridge";
 import { createTddEnforcementHook } from "./hooks/tdd-enforcement";
 import { createTodoTddInterceptor } from "./hooks/todo-tdd-wrapper";
 import { createStateSyncHook } from "./hooks/state-sync";
+import { createContextRecoveryHook } from "./hooks/context-recovery";
 
 export * from "./schema";
 export * from "./features/boulder-state";
@@ -19,6 +20,7 @@ export function createMaestroPlugin(ctx: PluginInput, maestroConfig?: MaestroCon
 	const bridgeHooks = createMaestroSisyphusBridgeHook(ctx, maestroConfig);
 	const tddHooks = createTddEnforcementHook(ctx, maestroConfig);
 	const tddInterceptor = createTodoTddInterceptor(ctx);
+	const contextRecoveryHooks = createContextRecoveryHook(ctx, maestroConfig);
 	createStateSyncHook(ctx);
 	
 	const combinedChatMessage = async (input: any, output: any) => {
@@ -45,6 +47,7 @@ export function createMaestroPlugin(ctx: PluginInput, maestroConfig?: MaestroCon
 		"tool.execute.after": combinedToolExecuteAfter,
 		"tool.execute.before": combinedToolExecuteBefore,
 		"agent.prompt.before": combinedAgentPromptBefore,
+		"provider.response.error": contextRecoveryHooks.hooks["provider.response.error"],
 	};
 }
 

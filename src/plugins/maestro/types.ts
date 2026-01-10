@@ -33,6 +33,22 @@ export interface MaestroHooks {
 		input: Record<string, never>,
 		output: { messages: Array<{ info: unknown; parts: unknown[] }> },
 	) => Promise<void>;
+	
+	/**
+	 * Called before agent prompt is sent
+	 */
+	"agent.prompt.before"?: (
+		input: Record<string, unknown>,
+		output: Record<string, unknown>,
+	) => Promise<void>;
+	
+	/**
+	 * Called when provider response encounters an error
+	 */
+	"provider.response.error"?: (
+		error: Error,
+		context: Record<string, unknown>,
+	) => Promise<{ prunableToolIds: string[] } | undefined>;
 }
 
 /**
