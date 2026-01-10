@@ -202,13 +202,14 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
     ? createSisyphusOrchestratorHook(ctx)
     : null;
 
-  const tddEnforcement = isHookEnabled("tdd-enforcement")
-    ? createTddEnforcementHook(ctx, pluginConfig.maestro)
-    : null;
+  // Maestro hooks disabled - removed from schema
+  // const tddEnforcement = isHookEnabled("tdd-enforcement")
+  //   ? createTddEnforcementHook(ctx, pluginConfig.maestro)
+  //   : null;
 
-  const maestroSisyphusBridge = isHookEnabled("maestro-sisyphus-bridge")
-    ? createMaestroSisyphusBridgeHook(ctx, pluginConfig.maestro)
-    : null;
+  // const maestroSisyphusBridge = isHookEnabled("maestro-sisyphus-bridge")
+  //   ? createMaestroSisyphusBridgeHook(ctx, pluginConfig.maestro)
+  //   : null;
 
   const prometheusMdOnly = isHookEnabled("prometheus-md-only")
     ? createPrometheusMdOnlyHook(ctx)
@@ -506,7 +507,6 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
 await editErrorRecovery?.["tool.execute.after"](input, output);
       await sisyphusOrchestrator?.["tool.execute.after"]?.(input, output);
       await taskResumeInfo["tool.execute.after"](input, output);
-      await backgroundNotificationHook?.["tool.execute.after"]?.(input, output);
     },
   };
 };

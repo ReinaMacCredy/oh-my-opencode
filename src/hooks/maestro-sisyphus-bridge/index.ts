@@ -3,7 +3,8 @@ import { existsSync, readdirSync, statSync, watch } from "node:fs"
 import { join, basename } from "node:path"
 import { HOOK_NAME, PLAN_READY_PROMPT, DESIGN_PHASE_CONTEXT, AUTO_EXECUTE_PROMPT } from "./constants"
 import { log } from "../../shared/logger"
-import type { MaestroConfig } from "../../config/schema"
+
+type MaestroConfig = { autoExecute?: boolean }
 
 export * from "./constants"
 
