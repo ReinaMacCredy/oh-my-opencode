@@ -9,6 +9,7 @@ import type { PluginInput } from "@opencode-ai/plugin"
 import { HOOK_NAME, TDD_PHASES, TDD_GATE_PROMPTS, TEST_FILE_PATTERNS, type TddPhase } from "./constants"
 import { readUnifiedState, updateTddState } from "../../../../features/boulder-state"
 import { log } from "../../../../shared/logger"
+import { maestroEventBus } from "../../events"
 import type { MaestroConfig } from "../../schema"
 
 export * from "./constants"
@@ -134,8 +135,21 @@ export function createTddEnforcementHook(ctx: PluginInput, maestroConfig?: Maest
       
       // Inject phase-appropriate guidance
       if (actionPhase === TDD_PHASES.RED && isTestFile(filePath)) {
+        const fromPhase = sessionTddPhase.get(sessionID)
         output.message = (output.message || "") + "\n\n" + TDD_GATE_PROMPTS.RED_REQUIRES_FAILING_TEST
         sessionTddPhase.set(sessionID, TDD_PHASES.RED)
+        
+        if (fromPhase && fromPhase !== TDD_PHASES.RED) {
+          maestroEventBus.emit({
+            type: "tdd:phase-changed",
+            payload: {
+              from: fromPhase,
+              to: TDD_PHASES.RED,
+              phase: TDD_PHASES.RED,
+              sessionId: sessionID,
+            },
+          })
+        }
       } else if (actionPhase === TDD_PHASES.GREEN) {
         output.message = (output.message || "") + "\n\n" + TDD_GATE_PROMPTS.GREEN_REQUIRES_PASSING_TEST
         sessionTddPhase.set(sessionID, TDD_PHASES.GREEN)
@@ -165,9 +179,20 @@ export function createTddEnforcementHook(ctx: PluginInput, maestroConfig?: Maest
           
           // Transition from GREEN to REFACTOR
           if (sessionTddPhase.get(sessionID) === TDD_PHASES.GREEN) {
+            const fromPhase = sessionTddPhase.get(sessionID)
             sessionTddPhase.set(sessionID, TDD_PHASES.REFACTOR)
             output.message = (output.message || "") + "\n\n" + TDD_GATE_PROMPTS.REFACTOR_REQUIRES_GREEN_TESTS
             updateTddState(ctx.directory, TDD_PHASES.REFACTOR, true)
+
+            maestroEventBus.emit({
+              type: "tdd:phase-changed",
+              payload: {
+                from: fromPhase,
+                to: TDD_PHASES.REFACTOR,
+                phase: TDD_PHASES.REFACTOR,
+                sessionId: sessionID,
+              },
+            })
           }
           
           log(`[${HOOK_NAME}] Tests passing`, { sessionID })
@@ -180,9 +205,20 @@ export function createTddEnforcementHook(ctx: PluginInput, maestroConfig?: Maest
           
           // Transition to GREEN (we have a failing test, can implement)
           if (sessionTddPhase.get(sessionID) === TDD_PHASES.RED) {
+            const fromPhase = sessionTddPhase.get(sessionID)
             sessionTddPhase.set(sessionID, TDD_PHASES.GREEN)
             log(`[${HOOK_NAME}] Failing test detected, moving to GREEN phase`, { sessionID })
             updateTddState(ctx.directory, TDD_PHASES.GREEN, false, "detected from test output")
+
+            maestroEventBus.emit({
+              type: "tdd:phase-changed",
+              payload: {
+                from: fromPhase,
+                to: TDD_PHASES.GREEN,
+                phase: TDD_PHASES.GREEN,
+                sessionId: sessionID,
+              },
+            })
           }
         }
       }
