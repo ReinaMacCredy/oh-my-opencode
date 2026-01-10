@@ -5,6 +5,7 @@ import { createTddEnforcementHook } from "./hooks/tdd-enforcement";
 
 export * from "./schema";
 export * from "./features/boulder-state";
+export * from "./types";
 
 export function createMaestroPlugin(ctx: PluginInput, maestroConfig?: MaestroConfig) {
 	const enabled = maestroConfig?.enabled ?? true;
