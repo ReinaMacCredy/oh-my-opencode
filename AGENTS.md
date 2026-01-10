@@ -147,7 +147,7 @@ src/plugins/maestro/
 ### Upstream Sync Strategy
 
 **Expected Merge Conflicts:**
-- `src/index.ts` (4 lines: fork imports + initialization)
+- `src/index.ts` (4 lines: fork imports + hook wiring)
 - `src/cli/install.ts` (ProxyPal mode generation)
 - `package.json` (fork-specific metadata)
 
@@ -156,6 +156,7 @@ src/plugins/maestro/
 - `src/features/*` (moved code has re-export shims)
 - `src/agents/*` (no changes)
 - `src/config/*` (fork schemas separate)
+- `src/plugins/maestro/*` (fork-specific, does not exist upstream)
 
 **Sync Commands:**
 ```bash
@@ -164,6 +165,107 @@ git fetch upstream
 git rebase upstream/dev
 # Resolve conflicts in src/index.ts, src/cli/install.ts, package.json only
 ```
+
+### Fork Isolation Pattern (MANDATORY)
+
+**When adding new fork-specific features, follow this pattern to minimize upstream conflicts:**
+
+#### Rule 1: Never Modify Upstream Core Files Directly
+
+❌ **BAD - Creates Upstream Conflicts:**
+```typescript
+// Modifying src/hooks/todo-continuation-enforcer.ts (upstream file)
+export interface TodoContinuationEnforcer {
+  handler: ...
+  setTddPhase: (phase: "red" | "green") => void  // ← Fork-specific addition
+}
+```
+
+✅ **GOOD - Fork-Isolated:**
+```typescript
+// src/plugins/maestro/hooks/todo-tdd-wrapper/index.ts (fork directory)
+export function createTodoTddInterceptor(ctx) {
+  // Wrap upstream hook with fork-specific logic
+  maestroEventBus.on((event) => {
+    if (event.type === "tdd:phase-changed") {
+      // Fork logic here
+    }
+  })
+}
+```
+
+#### Rule 2: Use Event Bus for Cross-Plugin Communication
+
+❌ **BAD - Direct Coupling:**
+```typescript
+// Fork feature directly calling upstream hook methods
+import { todoContinuationEnforcer } from "../../hooks/todo-continuation-enforcer"
+todoContinuationEnforcer.setTddPhase("red")  // ← Creates dependency
+```
+
+✅ **GOOD - Event-Based:**
+```typescript
+// Fork feature emits events, wrapper hook listens
+maestroEventBus.emit({ type: "tdd:phase-changed", payload: { phase: "red" } })
+// Wrapper intercepts and modifies behavior without touching upstream code
+```
+
+#### Rule 3: Create Wrappers/Interceptors in Fork Directories
+
+**Pattern:**
+1. Keep upstream files untouched
+2. Create wrapper in `src/plugins/maestro/hooks/` or `src/fork/`
+3. Wrapper listens to events and modifies behavior
+4. Wire wrapper in `src/index.ts` (minimal 1-line change)
+
+**Example - TDD Phase Integration:**
+```typescript
+// src/plugins/maestro/hooks/todo-tdd-wrapper/index.ts
+export function createTodoTddInterceptor(ctx: PluginInput) {
+  const sessionStates = new Map()
+  
+  maestroEventBus.on((event) => {
+    if (event.type === "tdd:phase-changed") {
+      sessionStates.set(event.payload.sessionId, event.payload.phase)
+    }
+  })
+
+  return {
+    "chat.message": async (input, output) => {
+      const phase = sessionStates.get(input.sessionID)
+      if (phase === "red") {
+        // Intercept and modify TODO continuation prompt
+        // No upstream file changes needed!
+      }
+    }
+  }
+}
+```
+
+#### Rule 4: Document Conflict Points in AGENTS.md
+
+After adding fork features, update this section:
+- List modified upstream files
+- Document minimal changes needed (line count)
+- Explain why each change is necessary
+
+#### Verification Checklist
+
+Before considering a fork feature complete:
+
+- [ ] All feature code in `src/fork/` or `src/plugins/maestro/`
+- [ ] No modifications to `src/hooks/*` (except re-export shims)
+- [ ] No modifications to `src/features/*` (except re-export shims)
+- [ ] Event bus used for cross-plugin communication
+- [ ] `src/index.ts` changes <= 5 lines
+- [ ] Upstream sync strategy updated in AGENTS.md
+- [ ] `git diff --name-only` shows minimal upstream file changes
+
+**Why This Matters:**
+- Upstream rebases remain conflict-free
+- Fork maintenance cost stays low
+- Features can be independently tested/disabled
+- Clear separation for future upstream contributions
 
 ## ANTI-PATTERNS (THIS PROJECT)
 

@@ -4,8 +4,8 @@ import { join, basename } from "node:path"
 import { HOOK_NAME, PLAN_READY_PROMPT, DESIGN_PHASE_CONTEXT, AUTO_EXECUTE_PROMPT } from "./constants"
 import { log } from "../../../../shared/logger"
 import { maestroEventBus } from "../../events"
-
-type MaestroConfig = { autoExecute?: boolean }
+import { createContextInjectionHook } from "../context-injection"
+import type { MaestroConfig } from "../../schema"
 
 export * from "./constants"
 
@@ -229,5 +229,7 @@ ${workflowProgress.currentTask ? `**Current Task**: ${workflowProgress.currentTa
         output.systemPrompt = (output.systemPrompt || "") + "\n\n" + progressContext
       }
     },
+
+    "experimental.chat.messages.transform": createContextInjectionHook(),
   }
 }

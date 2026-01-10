@@ -12,10 +12,10 @@ export const tddGatesConfigSchema = z
 export const maestroConfigSchema = z
 	.object({
 		enabled: z.boolean().optional().describe("Enable Maestro workflow features"),
-		boulder_state_enabled: z.boolean().optional().describe("Enable boulder state management"),
-		tdd_enforcement_enabled: z.boolean().optional().describe("Enable TDD enforcement"),
-		auto_execute: z.boolean().optional().describe("Auto-execute Sisyphus on plan ready"),
-		tdd_gates: tddGatesConfigSchema.optional().describe("TDD gate configuration"),
+		boulderStateEnabled: z.boolean().optional().describe("Enable boulder state management"),
+		enforceTdd: z.boolean().optional().describe("Enable TDD enforcement"),
+		autoExecute: z.boolean().optional().describe("Auto-execute Sisyphus on plan ready"),
+		tddGates: tddGatesConfigSchema.optional().describe("TDD gate configuration"),
 	})
 	.strict()
 	.partial();

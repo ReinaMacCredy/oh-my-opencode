@@ -6,6 +6,7 @@
  */
 
 import { z } from "zod";
+import { maestroConfigSchema } from "../plugins/maestro";
 
 /**
  * ProxyPal mode field
@@ -23,6 +24,7 @@ export const proxypalModeSchema = z
 export const forkConfigSchema = z
 	.object({
 		proxypal_mode: proxypalModeSchema,
+		maestro: maestroConfigSchema.optional().describe("Maestro workflow configuration"),
 	})
 	.strict()
 	.partial();

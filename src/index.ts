@@ -71,13 +71,14 @@ import { loadPluginConfig } from "./plugin-config";
 import { createModelCacheState, getModelLimit } from "./plugin-state";
 import { createConfigHandler } from "./plugin-handlers";
 import { initFork, initMaestroHooks } from "./fork";
+import type { MaestroHooks } from "./plugins/maestro";
 
 const OhMyOpenCodePlugin: Plugin = async (ctx) => {
   startTmuxCheck();
 
   let pluginConfig = loadPluginConfig(ctx.directory, ctx);
   pluginConfig = initFork(pluginConfig);
-  const maestroHooks = initMaestroHooks(ctx, pluginConfig);
+  const maestroHooks: MaestroHooks = initMaestroHooks(ctx, pluginConfig);
   const disabledHooks = new Set(pluginConfig.disabled_hooks ?? []);
   const isHookEnabled = (hookName: HookName) => !disabledHooks.has(hookName);
 
@@ -365,6 +366,8 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
         "experimental.chat.messages.transform"
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ]?.(input, output as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await maestroHooks?.["experimental.chat.messages.transform"]?.(input, output as any);
     },
 
     config: configHandler,
@@ -435,7 +438,7 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
 
     "tool.execute.before": async (input, output) => {
       await claudeCodeHooks["tool.execute.before"](input, output);
-      await (maestroHooks as any)?.["tool.execute.before"]?.(input, output);
+      await maestroHooks?.["tool.execute.before"]?.(input, output);
       await nonInteractiveEnv?.["tool.execute.before"](input, output);
       await commentChecker?.["tool.execute.before"](input, output);
       await directoryAgentsInjector?.["tool.execute.before"]?.(input, output);
@@ -490,7 +493,7 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
 
     "tool.execute.after": async (input, output) => {
       await claudeCodeHooks["tool.execute.after"](input, output);
-      await (maestroHooks as any)?.["tool.execute.after"]?.(input, output);
+      await maestroHooks?.["tool.execute.after"]?.(input, output);
       await toolOutputTruncator?.["tool.execute.after"](input, output);
       await contextWindowMonitor?.["tool.execute.after"](input, output);
       await commentChecker?.["tool.execute.after"](input, output);
