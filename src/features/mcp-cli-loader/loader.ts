@@ -16,7 +16,7 @@ interface McpCliConfigPath {
 
 function getMcpCliConfigPaths(): McpCliConfigPath[] {
   const cwd = process.cwd()
-  const home = homedir()
+  const home = process.env.HOME || homedir()
 
   return [
     { path: join(home, ".config", "opencode", "mcp_servers.json"), scope: "user" },

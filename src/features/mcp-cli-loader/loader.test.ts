@@ -1,9 +1,18 @@
 import { describe, it, expect, beforeEach, afterEach } from "bun:test"
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
-import { tmpdir } from "node:os"
+import { tmpdir, homedir } from "node:os"
 import { loadMcpCliConfigs } from "./loader"
 import type { McpCliConfig } from "./types"
+
+function isMcpCliInstalled(): boolean {
+  try {
+    const result = Bun.spawnSync(["which", "mcp-cli"])
+    return result.exitCode === 0
+  } catch {
+    return false
+  }
+}
 
 describe("mcp_servers.json config loader", () => {
   let tempDir: string
@@ -163,5 +172,57 @@ describe("mcp_servers.json config loader", () => {
     expect(result.servers.enabled).toBeDefined()
     expect(result.servers.disabled).toBeUndefined()
     expect(result.loadedServers).toHaveLength(1)
+  })
+})
+
+describe("mcp-cli binary integration", () => {
+  const MCP_CLI_INSTALLED = isMcpCliInstalled()
+
+  it.skipIf(!MCP_CLI_INSTALLED)("should show help with --help flag", async () => {
+    // #given - mcp-cli is installed
+
+    // #when - run mcp-cli --help
+    const proc = Bun.spawn(["mcp-cli", "--help"], {
+      stdout: "pipe",
+      stderr: "pipe",
+    })
+    const stdout = await new Response(proc.stdout).text()
+    const exitCode = await proc.exited
+
+    // #then - should show usage info
+    expect(exitCode).toBe(0)
+    expect(stdout).toContain("mcp-cli")
+  })
+
+  it.skipIf(!MCP_CLI_INSTALLED)("should show version with --version flag", async () => {
+    // #given - mcp-cli is installed
+
+    // #when - run mcp-cli --version
+    const proc = Bun.spawn(["mcp-cli", "--version"], {
+      stdout: "pipe",
+      stderr: "pipe",
+    })
+    const stdout = await new Response(proc.stdout).text()
+    const exitCode = await proc.exited
+
+    // #then - should show version
+    expect(exitCode).toBe(0)
+    expect(stdout).toMatch(/\d+\.\d+\.\d+/)
+  })
+
+  it.skipIf(!MCP_CLI_INSTALLED)("should accept -c flag for config path", async () => {
+    // #given - a non-existent config path
+    const fakePath = "/tmp/nonexistent-mcp-config.json"
+
+    // #when - run mcp-cli with -c flag (will error but shows flag is recognized)
+    const proc = Bun.spawn(["mcp-cli", "-c", fakePath], {
+      stdout: "pipe",
+      stderr: "pipe",
+    })
+    const stderr = await new Response(proc.stderr).text()
+    await proc.exited
+
+    // #then - should mention config file in error
+    expect(stderr).toContain("Config")
   })
 })
