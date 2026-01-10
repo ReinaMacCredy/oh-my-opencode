@@ -40,15 +40,57 @@ export interface MaestroHooks {
  */
 export type MaestroEvent =
 	| { type: "plan:ready"; payload: { planPath: string; planName: string } }
-	| { type: "task:started"; payload: { taskId: string; title: string } }
-	| { type: "task:completed"; payload: { taskId: string; title: string } }
+	| {
+			type: "task:started";
+			payload: {
+				taskId: string;
+				title: string;
+				sessionId: string;
+				timestamp: number;
+			};
+	  }
+	| {
+			type: "task:completed";
+			payload: {
+				taskId: string;
+				title: string;
+				sessionId: string;
+				timestamp: number;
+			};
+	  }
 	| {
 			type: "tdd:phase-changed";
-			payload: { phase: "red" | "green" | "refactor"; sessionId: string };
+			payload: {
+				phase: "red" | "green" | "refactor";
+				sessionId: string;
+				from?: "red" | "green" | "refactor";
+				to?: "red" | "green" | "refactor";
+			};
 	  }
-	| { type: "design:phase-changed"; payload: { from: number; to: number } }
+	| {
+			type: "design:phase-changed";
+			payload: {
+				fromPhase: number;
+				phase: number;
+				sessionID: string;
+				timestamp: number;
+			};
+	  }
 	| {
 			type: "workflow:started";
-			payload: { planPath: string; sessionId: string };
+			payload: {
+				sessionID: string;
+				timestamp: number;
+				totalTasks: number;
+				completedTasks: number;
+			};
 	  }
-	| { type: "workflow:completed"; payload: { planPath: string } };
+	| {
+			type: "workflow:completed";
+			payload: {
+				sessionID: string;
+				timestamp: number;
+				totalTasks: number;
+				completedTasks: number;
+			};
+	  };

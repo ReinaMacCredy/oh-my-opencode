@@ -22,8 +22,11 @@ interface BridgeHookOutput {
 // Track emitted plans to avoid duplicates
 const emittedPlans = new Set<string>()
 
+// Track previous todo states for event emission
+const todoStates = new Map<string, string>()
+
 // Design phase state (shared across hook calls)
-let currentDesignPhase: number | null = null
+const currentDesignPhases = new Map<string, number>()
 
 // Workflow state for bidirectional events
 interface WorkflowProgress {
@@ -58,6 +61,13 @@ export function updateWorkflowProgress(update: Partial<WorkflowProgress>): void 
   }
   log(`[${HOOK_NAME}] Workflow progress updated`, workflowProgress)
 }
+
+// Workflow state tracking for bidirectional events
+const workflowState = new Map<string, {
+  started: boolean
+  completed: boolean
+  lastTaskCount: number
+}>()
 
 export function createMaestroSisyphusBridgeHook(ctx: PluginInput, maestroConfig?: MaestroConfig) {
   const plansDir = join(ctx.directory, ".sisyphus", "plans")
@@ -152,14 +162,27 @@ export function createMaestroSisyphusBridgeHook(ctx: PluginInput, maestroConfig?
       if (input.tool === "sisyphus_task" || input.tool === "task") {
         const result = output.result as Record<string, unknown> | undefined
         
-        // Track design phase
         if (result?.designPhase) {
-          currentDesignPhase = result.designPhase as number
-          updateWorkflowProgress({ phase: currentDesignPhase })
-          log(`[${HOOK_NAME}] Design phase updated to: ${currentDesignPhase}`)
+          const newPhase = result.designPhase as number
+          const oldPhase = currentDesignPhases.get(input.sessionID)
+          
+          if (oldPhase !== newPhase) {
+            currentDesignPhases.set(input.sessionID, newPhase)
+            updateWorkflowProgress({ phase: newPhase })
+            
+            maestroEventBus.emit({
+              type: "design:phase-changed",
+              payload: {
+                sessionID: input.sessionID,
+                phase: newPhase,
+                fromPhase: oldPhase || 0,
+                timestamp: Date.now()
+              }
+            })
+            log(`[${HOOK_NAME}] Design phase updated to: ${newPhase}`)
+          }
         }
         
-        // Track task completion (bidirectional event)
         if (result?.taskCompleted) {
           const taskInfo = result.taskCompleted as { id: string; title: string }
           if (workflowProgress) {
@@ -171,20 +194,91 @@ export function createMaestroSisyphusBridgeHook(ctx: PluginInput, maestroConfig?
           log(`[${HOOK_NAME}] Task completed: ${taskInfo.title}`)
         }
         
-        // Track current task
         if (result?.currentTask) {
           const taskInfo = result.currentTask as { id: string; title: string }
           updateWorkflowProgress({ currentTask: taskInfo.title })
         }
       }
       
-      // Track todowrite updates for progress
       if (input.tool === "todowrite") {
-        const args = output.result as { todos?: Array<{ status: string }> } | undefined
+        const args = output.result as { todos?: Array<{ id: string; status: string; title: string }> } | undefined
         if (args?.todos) {
           const total = args.todos.length
           const completed = args.todos.filter(t => t.status === "completed").length
+          const inProgress = args.todos.filter(t => t.status === "in_progress").length
+          
           updateWorkflowProgress({ totalTasks: total, completedTasks: completed })
+          
+          for (const todo of args.todos) {
+            const prevState = todoStates.get(todo.id)
+            const newState = todo.status
+            const todoTitle = todo.title || (todo as any).content || "Untitled Task"
+            
+            if (prevState !== "in_progress" && newState === "in_progress") {
+              maestroEventBus.emit({
+                type: "task:started",
+                payload: {
+                  taskId: todo.id,
+                  title: todoTitle,
+                  sessionId: input.sessionID,
+                  timestamp: Date.now()
+                }
+              })
+              log(`[${HOOK_NAME}] Task started: ${todo.id}`)
+            }
+            
+            if (prevState === "in_progress" && newState === "completed") {
+              maestroEventBus.emit({
+                type: "task:completed",
+                payload: {
+                  taskId: todo.id,
+                  title: todoTitle,
+                  sessionId: input.sessionID,
+                  timestamp: Date.now()
+                }
+              })
+              log(`[${HOOK_NAME}] Task completed: ${todo.id}`)
+            }
+            
+            todoStates.set(todo.id, newState)
+          }
+          
+          const sessionState = workflowState.get(input.sessionID) || { started: false, completed: false, lastTaskCount: 0 }
+          
+          if (!sessionState.started && (inProgress > 0 || completed > 0) && total > 0) {
+            sessionState.started = true
+            workflowState.set(input.sessionID, sessionState)
+            
+            maestroEventBus.emit({
+              type: "workflow:started",
+              payload: {
+                sessionID: input.sessionID,
+                timestamp: Date.now(),
+                totalTasks: total,
+                completedTasks: completed
+              }
+            })
+            log(`[${HOOK_NAME}] Workflow started`)
+          }
+          
+          if (sessionState.started && !sessionState.completed && completed === total && total > 0) {
+            sessionState.completed = true
+            workflowState.set(input.sessionID, sessionState)
+            
+            maestroEventBus.emit({
+              type: "workflow:completed",
+              payload: {
+                sessionID: input.sessionID,
+                timestamp: Date.now(),
+                totalTasks: total,
+                completedTasks: completed
+              }
+            })
+            log(`[${HOOK_NAME}] Workflow completed`)
+          } else if (sessionState.completed && completed < total) {
+            sessionState.completed = false
+            workflowState.set(input.sessionID, sessionState)
+          }
         }
       }
     },
@@ -202,18 +296,19 @@ export function createMaestroSisyphusBridgeHook(ctx: PluginInput, maestroConfig?
       }
 
       // Inject design phase context
-      if (currentDesignPhase && currentDesignPhase >= 1 && currentDesignPhase <= 10) {
+      const sessionDesignPhase = currentDesignPhases.get(input.sessionID)
+      if (sessionDesignPhase && sessionDesignPhase >= 1 && sessionDesignPhase <= 10) {
         const phaseContext = DESIGN_PHASE_CONTEXT
-          .replace("$PHASE", String(currentDesignPhase))
+          .replace("$PHASE", String(sessionDesignPhase))
           .replace(/\$P(\d+)/g, (_, num) => {
             const phase = parseInt(num)
-            if (phase < currentDesignPhase!) return "DONE"
-            if (phase === currentDesignPhase) return "CURRENT"
+            if (phase < sessionDesignPhase!) return "DONE"
+            if (phase === sessionDesignPhase) return "CURRENT"
             return "PENDING"
           })
 
         output.systemPrompt = (output.systemPrompt || "") + "\n\n" + phaseContext
-        log(`[${HOOK_NAME}] Injected phase ${currentDesignPhase} context into ${input.agentName}`)
+        log(`[${HOOK_NAME}] Injected phase ${sessionDesignPhase} context into ${input.agentName}`)
       }
       
       // Inject workflow progress context
