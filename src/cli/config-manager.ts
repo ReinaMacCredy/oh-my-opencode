@@ -267,6 +267,9 @@ export function generateOmoConfig(installConfig: InstallConfig): Record<string, 
   const config: Record<string, unknown> = {
     $schema: "https://raw.githubusercontent.com/ReinaMacCredy/oh-my-opencode/main/assets/oh-my-opencode.schema.json",
     proxypal_mode: installConfig.hasProxyPal,
+    experimental: {
+      dcp_for_compaction: true,
+    },
   }
 
   if (installConfig.hasProxyPal || installConfig.hasGemini) {
