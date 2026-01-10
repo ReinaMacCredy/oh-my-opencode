@@ -10,7 +10,7 @@ import { join, dirname, basename } from "node:path"
 import type { BoulderState, PlanProgress } from "./types"
 import { BOULDER_DIR } from "./constants"
 import { readBoulderState, writeBoulderState, getPlanProgress, getPlanName } from "./storage"
-import { log } from "../../shared/logger"
+import { log } from "../../../../shared/logger"
 
 const UNIFIED_STATE_FILE = "workflow-state.json"
 const CONDUCTOR_DIR = "conductor"
