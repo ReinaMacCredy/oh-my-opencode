@@ -3,6 +3,7 @@ import { existsSync, readdirSync, statSync, watch } from "node:fs"
 import { join, basename } from "node:path"
 import { HOOK_NAME, PLAN_READY_PROMPT, DESIGN_PHASE_CONTEXT, AUTO_EXECUTE_PROMPT } from "./constants"
 import { log } from "../../../../shared/logger"
+import { maestroEventBus } from "../../events"
 
 type MaestroConfig = { autoExecute?: boolean }
 
@@ -115,6 +116,12 @@ export function createMaestroSisyphusBridgeHook(ctx: PluginInput, maestroConfig?
                 totalTasks: 0,
                 completedTasks: 0,
                 phase: 0,
+              })
+              
+              // Emit plan:ready event
+              maestroEventBus.emit({
+                type: "plan:ready",
+                payload: { planPath, planName },
               })
               
               // Inject as a system message

@@ -295,6 +295,7 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
       await contextInjector["chat.message"]?.(input, output);
       await autoSlashCommand?.["chat.message"]?.(input, output);
       await startWork?.["chat.message"]?.(input, output);
+      await maestroHooks?.["chat.message"]?.(input, output);
 
       if (ralphLoop) {
         const parts = (
