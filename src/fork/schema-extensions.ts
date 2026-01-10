@@ -8,25 +8,21 @@
 import { z } from "zod";
 
 /**
- * ProxyPal configuration schema
- * 
- * Will be merged into main config schema in Task 5
+ * ProxyPal mode field
+ * Simple boolean to enable/disable ProxyPal models
  */
-export const proxypalConfigSchema = z
-	.object({
-		enabled: z.boolean().default(true).describe("Enable ProxyPal model overrides"),
-	})
-	.strict()
-	.optional();
+export const proxypalModeSchema = z
+	.boolean()
+	.optional()
+	.describe("Enable ProxyPal models for all agents (fork-specific)");
 
 /**
  * Fork-specific config extensions
- * 
- * Add any additional fork-specific config fields here
+ * These fields are added to the main config schema
  */
 export const forkConfigSchema = z
 	.object({
-		proxypal: proxypalConfigSchema,
+		proxypal_mode: proxypalModeSchema,
 	})
 	.strict()
 	.partial();

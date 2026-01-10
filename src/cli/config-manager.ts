@@ -266,6 +266,7 @@ function deepMerge<T extends Record<string, unknown>>(target: T, source: Partial
 export function generateOmoConfig(installConfig: InstallConfig): Record<string, unknown> {
   const config: Record<string, unknown> = {
     $schema: "https://raw.githubusercontent.com/ReinaMacCredy/oh-my-opencode/main/assets/oh-my-opencode.schema.json",
+    proxypal_mode: installConfig.hasProxyPal,
   }
 
   if (installConfig.hasProxyPal || installConfig.hasGemini) {
