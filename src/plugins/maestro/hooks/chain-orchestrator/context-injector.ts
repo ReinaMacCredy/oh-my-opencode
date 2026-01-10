@@ -24,13 +24,13 @@ interface WorkflowProgress {
 	lastUpdated: string
 }
 
-interface AgentPromptInput {
+export interface AgentPromptInput {
 	agentName: string
 	sessionID: string
 	prompt: string
 }
 
-interface AgentPromptOutput {
+export interface AgentPromptOutput {
 	prompt?: string
 }
 
