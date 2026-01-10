@@ -93,4 +93,139 @@ describe("MaestroEvent union type", () => {
 
 		expect(event.type).toBe("workflow:completed");
 	});
+
+	it("should accept sisyphus:delegated event", () => {
+		const event: MaestroEvent = {
+			type: "sisyphus:delegated",
+			payload: { agentType: "oracle", taskDescription: "Review architecture", sessionId: "ses_123", timestamp: Date.now() },
+		};
+
+		expect(event.type).toBe("sisyphus:delegated");
+		expect(event.payload.agentType).toBe("oracle");
+	});
+
+	it("should accept sisyphus:continuing event", () => {
+		const event: MaestroEvent = {
+			type: "sisyphus:continuing",
+			payload: { reason: "boulder continuation", sessionId: "ses_123", timestamp: Date.now() },
+		};
+
+		expect(event.type).toBe("sisyphus:continuing");
+	});
+
+	it("should accept sisyphus:blocked event", () => {
+		const event: MaestroEvent = {
+			type: "sisyphus:blocked",
+			payload: { toolName: "write", reason: "orchestrator delegation required", sessionId: "ses_123", timestamp: Date.now() },
+		};
+
+		expect(event.type).toBe("sisyphus:blocked");
+	});
+
+	it("should accept sisyphus:verifying event", () => {
+		const event: MaestroEvent = {
+			type: "sisyphus:verifying",
+			payload: { checkType: "test completion", sessionId: "ses_123", timestamp: Date.now() },
+		};
+
+		expect(event.type).toBe("sisyphus:verifying");
+	});
+
+	it("should accept boulder:progress event", () => {
+		const event: MaestroEvent = {
+			type: "boulder:progress",
+			payload: { totalTasks: 10, completedTasks: 5, sessionId: "ses_123", timestamp: Date.now() },
+		};
+
+		expect(event.type).toBe("boulder:progress");
+		expect(event.payload.completedTasks).toBe(5);
+	});
+
+	it("should accept boulder:session-added event", () => {
+		const event: MaestroEvent = {
+			type: "boulder:session-added",
+			payload: { newSessionId: "ses_456", planPath: "/path/to/plan.md", timestamp: Date.now() },
+		};
+
+		expect(event.type).toBe("boulder:session-added");
+	});
+
+	it("should accept boulder:completed event", () => {
+		const event: MaestroEvent = {
+			type: "boulder:completed",
+			payload: { planPath: "/path/to/plan.md", totalTasks: 10, sessionId: "ses_123", timestamp: Date.now() },
+		};
+
+		expect(event.type).toBe("boulder:completed");
+	});
+
+	it("should accept context:pressure event", () => {
+		const event: MaestroEvent = {
+			type: "context:pressure",
+			payload: { currentTokens: 150000, maxTokens: 200000, percentage: 0.75, sessionId: "ses_123" },
+		};
+
+		expect(event.type).toBe("context:pressure");
+		expect(event.payload.percentage).toBe(0.75);
+	});
+
+	it("should accept context:pruned event", () => {
+		const event: MaestroEvent = {
+			type: "context:pruned",
+			payload: { prunedToolIds: ["tool-1", "tool-2"], tokensSaved: 5000, sessionId: "ses_123", timestamp: Date.now() },
+		};
+
+		expect(event.type).toBe("context:pruned");
+		expect(event.payload.tokensSaved).toBe(5000);
+	});
+});
+
+describe("Event type guards", () => {
+	it("should identify sisyphus events", () => {
+		// given
+		const delegated: MaestroEvent = {
+			type: "sisyphus:delegated",
+			payload: { agentType: "oracle", taskDescription: "test", sessionId: "ses_123", timestamp: Date.now() },
+		};
+		const taskStarted: MaestroEvent = {
+			type: "task:started",
+			payload: { taskId: "task-1", title: "Test", sessionId: "ses_123", timestamp: Date.now() },
+		};
+
+		// when/then
+		expect(delegated.type.startsWith("sisyphus:")).toBe(true);
+		expect(taskStarted.type.startsWith("sisyphus:")).toBe(false);
+	});
+
+	it("should identify boulder events", () => {
+		// given
+		const progress: MaestroEvent = {
+			type: "boulder:progress",
+			payload: { totalTasks: 10, completedTasks: 5, sessionId: "ses_123", timestamp: Date.now() },
+		};
+		const taskStarted: MaestroEvent = {
+			type: "task:started",
+			payload: { taskId: "task-1", title: "Test", sessionId: "ses_123", timestamp: Date.now() },
+		};
+
+		// when/then
+		expect(progress.type.startsWith("boulder:")).toBe(true);
+		expect(taskStarted.type.startsWith("boulder:")).toBe(false);
+	});
+
+	it("should identify context events", () => {
+		// given
+		const pressure: MaestroEvent = {
+			type: "context:pressure",
+			payload: { currentTokens: 150000, maxTokens: 200000, percentage: 0.75, sessionId: "ses_123" },
+		};
+		const taskStarted: MaestroEvent = {
+			type: "task:started",
+			payload: { taskId: "task-1", title: "Test", sessionId: "ses_123", timestamp: Date.now() },
+		};
+
+		// when/then
+		expect(pressure.type.startsWith("context:")).toBe(true);
+		expect(taskStarted.type.startsWith("context:")).toBe(false);
+	});
 });

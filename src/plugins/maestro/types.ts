@@ -93,4 +93,82 @@ export type MaestroEvent =
 				totalTasks: number;
 				completedTasks: number;
 			};
+	  }
+	| {
+			type: "sisyphus:delegated";
+			payload: {
+				agentType: string;
+				taskDescription: string;
+				sessionId: string;
+				timestamp: number;
+			};
+	  }
+	| {
+			type: "sisyphus:continuing";
+			payload: {
+				reason: string;
+				sessionId: string;
+				timestamp: number;
+			};
+	  }
+	| {
+			type: "sisyphus:blocked";
+			payload: {
+				toolName: string;
+				reason: string;
+				sessionId: string;
+				timestamp: number;
+			};
+	  }
+	| {
+			type: "sisyphus:verifying";
+			payload: {
+				checkType: string;
+				sessionId: string;
+				timestamp: number;
+			};
+	  }
+	| {
+			type: "boulder:progress";
+			payload: {
+				totalTasks: number;
+				completedTasks: number;
+				sessionId: string;
+				timestamp: number;
+			};
+	  }
+	| {
+			type: "boulder:session-added";
+			payload: {
+				newSessionId: string;
+				planPath: string;
+				timestamp: number;
+			};
+	  }
+	| {
+			type: "boulder:completed";
+			payload: {
+				planPath: string;
+				totalTasks: number;
+				sessionId: string;
+				timestamp: number;
+			};
+	  }
+	| {
+			type: "context:pressure";
+			payload: {
+				currentTokens: number;
+				maxTokens: number;
+				percentage: number;
+				sessionId: string;
+			};
+	  }
+	| {
+			type: "context:pruned";
+			payload: {
+				prunedToolIds: string[];
+				tokensSaved: number;
+				sessionId: string;
+				timestamp: number;
+			};
 	  };
