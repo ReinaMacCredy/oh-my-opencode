@@ -9,8 +9,7 @@ import type { PluginInput } from "@opencode-ai/plugin"
 import { HOOK_NAME, TDD_PHASES, TDD_GATE_PROMPTS, TEST_FILE_PATTERNS, type TddPhase } from "./constants"
 import { readUnifiedState, updateTddState } from "../../../../features/boulder-state"
 import { log } from "../../../../shared/logger"
-
-type MaestroConfig = { enforceTdd?: boolean; tddGates?: Record<string, boolean> }
+import type { MaestroConfig } from "../../schema"
 
 export * from "./constants"
 

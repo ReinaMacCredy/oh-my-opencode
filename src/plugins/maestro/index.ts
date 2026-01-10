@@ -2,6 +2,7 @@ import type { PluginInput } from "@opencode-ai/plugin";
 import type { MaestroConfig } from "./schema";
 import { createMaestroSisyphusBridgeHook } from "./hooks/sisyphus-bridge";
 import { createTddEnforcementHook } from "./hooks/tdd-enforcement";
+import { createTodoTddInterceptor } from "./hooks/todo-tdd-wrapper";
 
 export * from "./schema";
 export * from "./features/boulder-state";
@@ -14,12 +15,18 @@ export function createMaestroPlugin(ctx: PluginInput, maestroConfig?: MaestroCon
 		return {};
 	}
 	
-	const bridgeHooks = createMaestroSisyphusBridgeHook(ctx, maestroConfig as any);
-	const tddHooks = createTddEnforcementHook(ctx, maestroConfig as any);
+	const bridgeHooks = createMaestroSisyphusBridgeHook(ctx, maestroConfig);
+	const tddHooks = createTddEnforcementHook(ctx, maestroConfig);
+	const tddInterceptor = createTodoTddInterceptor(ctx);
+	
+	const combinedChatMessage = async (input: any, output: any) => {
+		await bridgeHooks["chat.message"]?.(input, output);
+		await tddInterceptor["chat.message"]?.(input, output);
+	};
 	
 	return {
-		...bridgeHooks,
 		...tddHooks,
+		"chat.message": combinedChatMessage,
 	};
 }
 
