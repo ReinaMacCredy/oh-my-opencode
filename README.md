@@ -820,6 +820,34 @@ When both `oh-my-opencode.jsonc` and `oh-my-opencode.json` files exist, `.jsonc`
 }
 ```
 
+### ProxyPal Mode (Fork Feature)
+
+This fork adds ProxyPal model integration via the `opencode-openai-codex-auth` plugin. Enable ProxyPal mode to use GPT-5.2 and GPT-5.1 models:
+
+```json
+{
+  "proxypal_mode": true
+}
+```
+
+**During Installation:**
+```bash
+bunx @reinamaccredy/oh-my-opencode install --proxypal=yes
+```
+
+**ProxyPal Models Available:**
+- **Agent Models**: `proxypal/gpt-5.2-codex`, `proxypal/gpt-5.1-codex`, `proxypal/gpt-5.1-codex-mini`
+- **Category Models**: Used for task delegation with different reasoning effort levels
+
+**Requirements:**
+1. Install the ProxyPal auth plugin: `opencode-openai-codex-auth@4.3.0`
+2. Configure provider/models in `opencode.json` (see [Installation > OpenAI](#openai-chatgpt-pluspro))
+3. Authenticate with ChatGPT Plus/Pro subscription
+
+**See Also:**
+- [Fork Architecture Documentation](#fork-architecture) (in `AGENTS.md`)
+- [Upstream Sync Strategy](#upstream-sync-strategy) (in `AGENTS.md`)
+
 ### Google Auth
 
 **Recommended**: Use the external [`opencode-antigravity-auth`](https://github.com/NoeFabris/opencode-antigravity-auth) plugin. It provides multi-account load balancing, more models (including Claude via Antigravity), and active maintenance. See [Installation > Google Gemini](#google-gemini-antigravity-oauth).

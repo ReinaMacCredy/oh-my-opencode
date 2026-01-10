@@ -20,6 +20,8 @@ oh-my-opencode/
 │   ├── auth/          # Google Antigravity OAuth - see src/auth/AGENTS.md
 │   ├── shared/        # Cross-cutting utilities - see src/shared/AGENTS.md
 │   ├── cli/           # CLI installer, doctor - see src/cli/AGENTS.md
+│   ├── fork/          # Fork-specific code (ProxyPal models, Maestro integration)
+│   ├── plugins/       # Independently publishable plugins (Maestro)
 │   ├── mcp/           # MCP configs: context7, grep_app
 │   ├── config/        # Zod schema, TypeScript types
 │   └── index.ts       # Main plugin entry (548 lines)
@@ -48,6 +50,8 @@ oh-my-opencode/
 | CLI installer | `src/cli/install.ts` | Interactive TUI installation |
 | Doctor checks | `src/cli/doctor/checks/` | Health checks for environment |
 | Shared utilities | `src/shared/` | Cross-cutting utilities |
+| Fork isolation | `src/fork/` | ProxyPal models, Maestro integration, fork initialization |
+| Maestro plugin | `src/plugins/maestro/` | Independently publishable Maestro workflow plugin |
 | Slash commands | `src/hooks/auto-slash-command/` | Auto-detect and execute `/command` patterns |
 | Ralph Loop | `src/hooks/ralph-loop/` | Self-referential dev loop until completion |
 | Orchestrator | `src/hooks/sisyphus-orchestrator/` | Main orchestration hook (660 lines) |
@@ -85,6 +89,81 @@ oh-my-opencode/
 - **Naming**: kebab-case directories, createXXXHook/createXXXTool factories
 - **Testing**: BDD comments `#given/#when/#then`, TDD workflow (RED-GREEN-REFACTOR)
 - **Temperature**: 0.1 for code agents, max 0.3
+
+## FORK ARCHITECTURE
+
+This fork separates fork-specific code into isolated directories for easier upstream syncing:
+
+### src/fork/ - Fork Isolation Layer
+
+All fork-specific modifications live here:
+
+```
+src/fork/
+├── proxypal/
+│   └── models.ts          # Centralized ProxyPal model constants (18 models)
+├── schema-extensions.ts   # Fork-specific Zod schemas (proxypal_mode)
+└── index.ts               # initFork() + initMaestroHooks()
+```
+
+**Key Functions:**
+- `initFork(config)`: Initializes fork-specific config (ProxyPal mode toggle)
+- `initMaestroHooks(ctx, config)`: Loads Maestro plugin hooks if enabled
+
+**ProxyPal Models:**
+- 11 agent models (e.g., `proxypal/gpt-5.2-codex`)
+- 7 category models (e.g., `proxypal/gpt-5.1-codex`)
+- All centralized in `src/fork/proxypal/models.ts`
+
+**Config Field:**
+- `proxypal_mode`: Boolean toggle for ProxyPal features
+- CLI flag: `--proxypal=<yes|no>`
+
+### src/plugins/maestro/ - Maestro Plugin
+
+Independently publishable Maestro workflow plugin:
+
+```
+src/plugins/maestro/
+├── hooks/
+│   ├── sisyphus-bridge/     # Maestro-Sisyphus integration
+│   └── tdd-enforcement/     # TDD gate enforcement
+├── features/
+│   └── boulder-state/       # Workflow state management
+├── package.json             # @reinamaccredy/maestro-plugin
+├── schema.ts                # MaestroConfig + TddGatesConfig
+└── index.ts                 # createMaestroPlugin()
+```
+
+**Re-export Shims (Backward Compatibility):**
+- `src/hooks/maestro-sisyphus-bridge/index.ts` → re-exports from plugin
+- `src/hooks/tdd-enforcement/index.ts` → re-exports from plugin
+- `src/features/boulder-state/index.ts` → re-exports from plugin
+
+**Integration:**
+- Called via `initMaestroHooks()` in fork initialization
+- Hooks into `tool.execute.before` chain in `src/index.ts`
+
+### Upstream Sync Strategy
+
+**Expected Merge Conflicts:**
+- `src/index.ts` (4 lines: fork imports + initialization)
+- `src/cli/install.ts` (ProxyPal mode generation)
+- `package.json` (fork-specific metadata)
+
+**No Conflicts Expected:**
+- `src/hooks/*` (moved code has re-export shims)
+- `src/features/*` (moved code has re-export shims)
+- `src/agents/*` (no changes)
+- `src/config/*` (fork schemas separate)
+
+**Sync Commands:**
+```bash
+git remote add upstream https://github.com/code-yeongyu/oh-my-opencode.git
+git fetch upstream
+git rebase upstream/dev
+# Resolve conflicts in src/index.ts, src/cli/install.ts, package.json only
+```
 
 ## ANTI-PATTERNS (THIS PROJECT)
 
