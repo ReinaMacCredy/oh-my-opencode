@@ -11,8 +11,19 @@
     "disabled_mcps": {
       "type": "array",
       "items": {
-        "type": "string",
-        "minLength": 1
+        "anyOf": [
+          {
+            "type": "string",
+            "enum": [
+              "context7",
+              "grep_app",
+              "websearch"
+            ]
+          },
+          {
+            "type": "string"
+          }
+        ]
       }
     },
     "disabled_agents": {
@@ -79,9 +90,7 @@
           "edit-error-recovery",
           "prometheus-md-only",
           "start-work",
-          "sisyphus-orchestrator",
-          "maestro-sisyphus-bridge",
-          "tdd-enforcement"
+          "sisyphus-orchestrator"
         ]
       }
     },
@@ -1930,6 +1939,9 @@
         }
       }
     },
+    "google_auth": {
+      "type": "boolean"
+    },
     "sisyphus_agent": {
       "type": "object",
       "properties": {
@@ -2258,52 +2270,6 @@
         "include_co_authored_by": {
           "default": true,
           "type": "boolean"
-        }
-      }
-    },
-    "maestro": {
-      "type": "object",
-      "properties": {
-        "autoExecute": {
-          "default": false,
-          "type": "boolean"
-        },
-        "useDesignPhases": {
-          "default": true,
-          "type": "boolean"
-        },
-        "useTracking": {
-          "default": true,
-          "type": "boolean"
-        },
-        "preferredExecutionMode": {
-          "default": "maestro",
-          "type": "string",
-          "enum": [
-            "maestro",
-            "sisyphus"
-          ]
-        },
-        "enforceTdd": {
-          "default": false,
-          "type": "boolean"
-        },
-        "tddGates": {
-          "type": "object",
-          "properties": {
-            "requireFailingTest": {
-              "default": true,
-              "type": "boolean"
-            },
-            "requirePassingTest": {
-              "default": true,
-              "type": "boolean"
-            },
-            "runFullSuiteAfterRefactor": {
-              "default": true,
-              "type": "boolean"
-            }
-          }
         }
       }
     }

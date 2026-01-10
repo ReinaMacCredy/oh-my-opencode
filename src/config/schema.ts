@@ -1,5 +1,9 @@
 import { z } from "zod"
-import { AnyMcpNameSchema, McpNameSchema } from "../mcp/types"
+
+export const McpNameSchema = z.enum(["context7", "grep_app", "websearch"])
+export type McpName = z.infer<typeof McpNameSchema>
+export const AnyMcpNameSchema = z.union([McpNameSchema, z.string()])
+export type AnyMcpName = z.infer<typeof AnyMcpNameSchema>
 
 const PermissionValue = z.enum(["ask", "allow", "deny"])
 
@@ -339,5 +343,3 @@ export type CategoryConfig = z.infer<typeof CategoryConfigSchema>
 export type CategoriesConfig = z.infer<typeof CategoriesConfigSchema>
 export type BuiltinCategoryName = z.infer<typeof BuiltinCategoryNameSchema>
 export type GitMasterConfig = z.infer<typeof GitMasterConfigSchema>
-
-export { AnyMcpNameSchema, type AnyMcpName, McpNameSchema, type McpName } from "../mcp/types"

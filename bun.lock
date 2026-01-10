@@ -13,7 +13,7 @@
         "@openauthjs/openauth": "^0.4.3",
         "@opencode-ai/plugin": "^1.1.1",
         "@opencode-ai/sdk": "^1.1.1",
-        "@reinamaccredy/oh-my-opencode": "^3.0.0-beta.13",
+        "@reinamaccredy/oh-my-opencode": "^3.0.1-beta.3",
         "commander": "^14.0.2",
         "hono": "^4.10.4",
         "js-yaml": "^4.1.1",
@@ -100,7 +100,7 @@
 
     "@oslojs/jwt": ["@oslojs/jwt@0.2.0", "", { "dependencies": { "@oslojs/encoding": "0.4.1" } }, "sha512-bLE7BtHrURedCn4Mco3ma9L4Y1GR2SMBuIvjWr7rmQ4/W/4Jy70TIAgZ+0nIlk0xHz1vNP8x8DCns45Sb2XRbg=="],
 
-    "@reinamaccredy/oh-my-opencode": ["@reinamaccredy/oh-my-opencode@3.0.0-beta.13", "", { "dependencies": { "@ast-grep/cli": "^0.40.0", "@ast-grep/napi": "^0.40.0", "@clack/prompts": "^0.11.0", "@code-yeongyu/comment-checker": "^0.6.1", "@modelcontextprotocol/sdk": "^1.25.1", "@openauthjs/openauth": "^0.4.3", "@opencode-ai/plugin": "^1.1.1", "@opencode-ai/sdk": "^1.1.1", "commander": "^14.0.2", "hono": "^4.10.4", "js-yaml": "^4.1.1", "jsonc-parser": "^3.3.1", "open": "^11.0.0", "picocolors": "^1.1.1", "picomatch": "^4.0.2", "xdg-basedir": "^5.1.0", "zod": "^4.1.8" }, "bin": { "oh-my-opencode": "dist/cli/index.js", "omo": "dist/cli/index.js" } }, "sha512-qB22n1th3olPiZZzKHivkFT+keEzVuGgCBBc6fb3gQjjzJi5DtXlr0ugc7My+sZ/la9lRSP9Koqf9/U3xe/4BA=="],
+    "@reinamaccredy/oh-my-opencode": ["@reinamaccredy/oh-my-opencode@3.0.1-beta.3", "", { "dependencies": { "@ast-grep/cli": "^0.40.0", "@ast-grep/napi": "^0.40.0", "@clack/prompts": "^0.11.0", "@code-yeongyu/comment-checker": "^0.6.1", "@modelcontextprotocol/sdk": "^1.25.1", "@openauthjs/openauth": "^0.4.3", "@opencode-ai/plugin": "^1.1.1", "@opencode-ai/sdk": "^1.1.1", "@reinamaccredy/oh-my-opencode": "^3.0.0-beta.13", "commander": "^14.0.2", "hono": "^4.10.4", "js-yaml": "^4.1.1", "jsonc-parser": "^3.3.1", "open": "^11.0.0", "picocolors": "^1.1.1", "picomatch": "^4.0.2", "xdg-basedir": "^5.1.0", "zod": "^4.1.8" }, "bin": { "oh-my-opencode": "dist/cli/index.js", "omo": "dist/cli/index.js" } }, "sha512-GMus2F2YV1+U6fnB5eX1oKkWI0HxfO0QT9Cc+14oVdry2ReZmJ1NS1MpcLKl+aE57G49SyNH5ODMScNotzzNQw=="],
 
     "@standard-schema/spec": ["@standard-schema/spec@1.0.0-beta.3", "", {}, "sha512-0ifF3BjA1E8SY9C+nUew8RefNOIq0cDlYALPty4rhUm8Rrl6tCM8hBT4bhGhx7I7iXD0uAgt50lgo8dD73ACMw=="],
 
@@ -341,5 +341,7 @@
     "@openauthjs/openauth/jose": ["jose@5.9.6", "", {}, "sha512-AMlnetc9+CV9asI19zHmrgS/WYsWUwCn2R7RzlbJWD7F9eWYUTGyBmU9o6PxngtLGOiDGPRu+Uc4fhKzbpteZQ=="],
 
     "@oslojs/jwt/@oslojs/encoding": ["@oslojs/encoding@0.4.1", "", {}, "sha512-hkjo6MuIK/kQR5CrGNdAPZhS01ZCXuWDRJ187zh6qqF2+yMHZpD9fAYpX8q2bOO6Ryhl3XpCT6kUX76N8hhm4Q=="],
+
+    "@reinamaccredy/oh-my-opencode/@reinamaccredy/oh-my-opencode": ["@reinamaccredy/oh-my-opencode@3.0.0-beta.13", "", { "dependencies": { "@ast-grep/cli": "^0.40.0", "@ast-grep/napi": "^0.40.0", "@clack/prompts": "^0.11.0", "@code-yeongyu/comment-checker": "^0.6.1", "@modelcontextprotocol/sdk": "^1.25.1", "@openauthjs/openauth": "^0.4.3", "@opencode-ai/plugin": "^1.1.1", "@opencode-ai/sdk": "^1.1.1", "commander": "^14.0.2", "hono": "^4.10.4", "js-yaml": "^4.1.1", "jsonc-parser": "^3.3.1", "open": "^11.0.0", "picocolors": "^1.1.1", "picomatch": "^4.0.2", "xdg-basedir": "^5.1.0", "zod": "^4.1.8" }, "bin": { "oh-my-opencode": "dist/cli/index.js", "omo": "dist/cli/index.js" } }, "sha512-qB22n1th3olPiZZzKHivkFT+keEzVuGgCBBc6fb3gQjjzJi5DtXlr0ugc7My+sZ/la9lRSP9Koqf9/U3xe/4BA=="],
   }
 }
